@@ -500,7 +500,7 @@ impl TerritorialStrategist {
             let next_pos = you.head.apply_direction(&direction);
             
             // Calculate territorial control score
-            let territorial_score = SpaceController.get_area_control_score(
+            let territorial_score = self.space_controller.get_area_control_score(
                 &you.head, &next_pos, board, &all_snakes, &you.id);
             
             // Food seeking integration (only when needed)
@@ -515,7 +515,7 @@ impl TerritorialStrategist {
             // Opponent cutting and area denial
             let cutting_score = OpponentAnalyzer::identify_cutting_positions(
                 &you.head, you, board).len() as f32 * 0.5;
-            let area_denial_score = SpaceController.get_area_control_score(
+            let area_denial_score = self.space_controller.get_area_control_score(
                 &you.head, &next_pos, board, &all_snakes, &you.id);
             
             // Combine all scoring factors
@@ -629,7 +629,7 @@ impl HybridDecisionMaker {
 // PHASE 2A: MINIMAX SEARCH ENGINE WITH GAME STATE SIMULATION
 // ============================================================================
 
-// Game State Simulation Engine for Multi-ply Lookahead
+// Game State Simulation Engine for Multi-ply Lookahead with Opponent Modeling Support
 #[derive(Debug, Clone)]
 pub struct SimulatedGameState {
     pub board_width: i32,
@@ -637,6 +637,9 @@ pub struct SimulatedGameState {
     pub food: Vec<Coord>,
     pub snakes: Vec<SimulatedSnake>,
     pub turn: i32,
+    pub opponent_modeling: bool,           // Whether to use opponent modeling
+    pub modeling_config: OpponentModelingConfig, // Current modeling configuration
+    pub prediction_cache: OpponentPredictionCache, // Cache for predictions
 }
 
 #[derive(Debug, Clone)]
@@ -944,8 +947,18 @@ impl GameSimulator {
         }
     }
     
-    // Convert from API structures to simulation state
+    // Convert from API structures to simulation state with opponent modeling support
     pub fn from_game_state(_game: &Game, board: &Board, _you: &Battlesnake) -> SimulatedGameState {
+        let default_config = OpponentModelingConfig {
+            mode: OpponentModelingMode::Rational,
+            prediction_weight: 0.7,
+            confidence_threshold: 0.5,
+            cache_predictions: true,
+            max_cache_size: 100,
+            use_predictions_for_ordering: true,
+            early_termination_threshold: 0.8,
+        };
+        
         SimulatedGameState {
             board_width: board.width,
             board_height: board.height,
@@ -957,6 +970,9 @@ impl GameSimulator {
                 is_alive: true,
             }).collect(),
             turn: 0, // Will be set by search algorithm
+            opponent_modeling: true, // Enable opponent modeling by default
+            modeling_config: default_config,
+            prediction_cache: OpponentPredictionCache::new(100),
         }
     }
     
@@ -969,6 +985,788 @@ impl GameSimulator {
     // Get our snake from simulation state
     pub fn get_our_snake<'a>(state: &'a SimulatedGameState, our_id: &str) -> Option<&'a SimulatedSnake> {
         state.snakes.iter().find(|snake| snake.id == our_id)
+    }
+    
+    // ============================================================================
+    // PHASE 2B: ADVANCED OPPONENT MODELING INTEGRATION
+    // ============================================================================
+    
+    /// Generate prediction-based moves for a specific snake using OpponentAnalyzer
+    pub fn generate_prediction_based_moves(
+        snake: &SimulatedSnake,
+        state: &SimulatedGameState,
+        config: &OpponentModelingConfig
+    ) -> Vec<(Direction, f32)> {
+        let mut move_probabilities = Vec::new();
+        
+        // Convert to API format for OpponentAnalyzer
+        let api_snake = Battlesnake {
+            id: snake.id.clone(),
+            name: format!("Snake_{}", snake.id),
+            health: snake.health,
+            body: snake.body.clone(),
+            head: if !snake.body.is_empty() { snake.body[0] } else { Coord { x: 0, y: 0 } },
+            length: snake.body.len() as i32,
+            latency: "0".to_string(),
+            shout: None,
+        };
+        
+        let api_board = Board {
+            width: state.board_width,
+            height: state.board_height,
+            food: state.food.clone(),
+            snakes: state.snakes.iter().map(|s| Battlesnake {
+                id: s.id.clone(),
+                name: format!("Snake_{}", s.id),
+                health: s.health,
+                body: s.body.clone(),
+                head: if !s.body.is_empty() { s.body[0] } else { Coord { x: 0, y: 0 } },
+                length: s.body.len() as i32,
+                latency: "0".to_string(),
+                shout: None,
+            }).collect(),
+            hazards: Vec::new(),
+        };
+        
+        let all_snakes: Vec<Battlesnake> = api_board.snakes.clone();
+        
+        match config.mode {
+            OpponentModelingMode::Predicted => {
+                // Use predictions exclusively
+                let predictions = OpponentAnalyzer::predict_opponent_moves(&api_snake, &api_board, &all_snakes);
+                for direction in Direction::all() {
+                    let prob = predictions.get(&direction).unwrap_or(&0.0);
+                    if *prob > 0.0 {
+                        move_probabilities.push((direction, *prob));
+                    }
+                }
+            },
+            OpponentModelingMode::Hybrid => {
+                // Combine predictions with rational analysis
+                let predictions = OpponentAnalyzer::predict_opponent_moves(&api_snake, &api_board, &all_snakes);
+                let rational_moves = Self::generate_moves_for_snake(snake, state);
+                let rational_moves_count = rational_moves.len();
+                
+                for direction in &rational_moves {
+                    let pred_prob = predictions.get(direction).unwrap_or(&0.0);
+                    let rational_weight = 1.0 - config.prediction_weight;
+                    let combined_prob = (config.prediction_weight * pred_prob) + (rational_weight / rational_moves_count as f32);
+                    
+                    if combined_prob > config.confidence_threshold {
+                        move_probabilities.push((direction.clone(), combined_prob));
+                    } else {
+                        // Fallback to uniform rational distribution
+                        move_probabilities.push((direction.clone(), rational_weight / rational_moves_count as f32));
+                    }
+                }
+                
+                for direction in &rational_moves {
+                    let pred_prob = predictions.get(direction).unwrap_or(&0.0);
+                    let rational_weight = 1.0 - config.prediction_weight;
+                    let combined_prob = (config.prediction_weight * pred_prob) + (rational_weight / rational_moves.len() as f32);
+                    
+                    if combined_prob > config.confidence_threshold {
+                        move_probabilities.push((*direction, combined_prob));
+                    } else {
+                        // Fallback to uniform rational distribution
+                        move_probabilities.push((*direction, rational_weight / rational_moves.len() as f32));
+                    }
+                }
+            },
+            _ => {
+                // Rational mode - use uniform distribution
+                let rational_moves = Self::generate_moves_for_snake(snake, state);
+                let uniform_prob = 1.0 / rational_moves.len() as f32;
+                for direction in rational_moves {
+                    move_probabilities.push((direction, uniform_prob));
+                }
+            }
+        }
+        
+        // Normalize probabilities
+        let total_prob: f32 = move_probabilities.iter().map(|(_, prob)| prob).sum();
+        if total_prob > 0.0 {
+            for (_, prob) in &mut move_probabilities {
+                *prob /= total_prob;
+            }
+        }
+        
+        move_probabilities
+    }
+    
+    /// Generate move combinations using opponent predictions
+    pub fn generate_predicted_move_combinations(
+        state: &SimulatedGameState,
+        our_snake_id: &str,
+        our_move: Direction,
+        config: &OpponentModelingConfig
+    ) -> Vec<(Vec<Direction>, f32)> {
+        let alive_snakes: Vec<&SimulatedSnake> = state.snakes.iter()
+            .filter(|snake| snake.is_alive)
+            .collect();
+        
+        if alive_snakes.is_empty() {
+            return Vec::new();
+        }
+        
+        // Find our position in the alive snakes list
+        let our_index = alive_snakes.iter().position(|s| s.id == our_snake_id);
+        if our_index.is_none() {
+            return Vec::new();
+        }
+        let our_index = our_index.unwrap();
+        
+        // Generate move combinations with probabilities
+        let mut move_combinations = Vec::new();
+        let mut snake_move_probs = Vec::new();
+        
+        for (i, snake) in alive_snakes.iter().enumerate() {
+            if i == our_index {
+                // Fixed move for us
+                snake_move_probs.push(vec![(our_move, 1.0)]);
+            } else {
+                // Predicted moves for opponents
+                let predictions = Self::generate_prediction_based_moves(snake, state, config);
+                snake_move_probs.push(predictions);
+            }
+        }
+        
+        // Generate all combinations with combined probabilities
+        Self::generate_probabilistic_combinations(&snake_move_probs, &mut move_combinations, Vec::new(), 1.0, 0);
+        move_combinations
+    }
+    
+    /// Helper to generate probabilistic combinations
+    fn generate_probabilistic_combinations(
+        snake_moves: &[Vec<(Direction, f32)>],
+        result: &mut Vec<(Vec<Direction>, f32)>,
+        current_moves: Vec<Direction>,
+        current_prob: f32,
+        depth: usize,
+    ) {
+        if depth == snake_moves.len() {
+            result.push((current_moves, current_prob));
+            return;
+        }
+        
+        for (direction, prob) in &snake_moves[depth] {
+            let mut new_moves = current_moves.clone();
+            new_moves.push(*direction);
+            let new_prob = current_prob * prob;
+            Self::generate_probabilistic_combinations(snake_moves, result, new_moves, new_prob, depth + 1);
+        }
+    }
+    
+    /// Sample moves according to probability distribution
+    pub fn sample_moves_by_probability(move_probs: &[(Direction, f32)]) -> Vec<Direction> {
+        use rand::Rng;
+        
+        let mut rng = rand::rng();
+        let mut selected_moves = Vec::new();
+        
+        // For expectiminimax, we might want to sample multiple times
+        let sample_count = 1; // Could be configurable
+        
+        for _ in 0..sample_count {
+            let rand_val: f32 = rng.random();
+            let mut cumulative_prob = 0.0;
+            
+            for (direction, prob) in move_probs {
+                cumulative_prob += prob;
+                if rand_val <= cumulative_prob {
+                    selected_moves.push(*direction);
+                    break;
+                }
+            }
+        }
+        
+        selected_moves
+    }
+    
+    /// Calculate prediction confidence score for debugging
+    pub fn calculate_prediction_confidence(
+        snake: &SimulatedSnake,
+        state: &SimulatedGameState,
+        config: &OpponentModelingConfig
+    ) -> f32 {
+        let move_probs = Self::generate_prediction_based_moves(snake, state, config);
+        
+        if move_probs.is_empty() {
+            return 0.0;
+        }
+        
+        // Calculate entropy-based confidence (lower entropy = higher confidence)
+        let entropy: f32 = move_probs.iter()
+            .map(|(_, prob)| {
+                if *prob > 0.0 {
+                    -prob * prob.log2()
+                } else {
+                    0.0
+                }
+            })
+            .sum();
+        
+        // Normalize entropy (max entropy for n moves is log2(n))
+        let max_entropy = (move_probs.len() as f32).log2();
+        if max_entropy > 0.0 {
+            1.0 - (entropy / max_entropy)
+        } else {
+            1.0
+        }
+    }
+}
+
+// ============================================================================
+// PHASE 2B: OPPONENT MODELING INTEGRATION UTILITIES
+// ============================================================================
+
+/// Configuration manager for opponent modeling settings
+pub struct OpponentModelingManager {
+    pub default_config: OpponentModelingConfig,
+    pub debug_mode: bool,
+    pub performance_tracking: bool,
+}
+
+impl OpponentModelingManager {
+    pub fn new() -> Self {
+        Self {
+            default_config: OpponentModelingConfig {
+                mode: OpponentModelingMode::Hybrid,
+                prediction_weight: 0.7,
+                confidence_threshold: 0.5,
+                cache_predictions: true,
+                max_cache_size: 100,
+                use_predictions_for_ordering: true,
+                early_termination_threshold: 0.8,
+            },
+            debug_mode: false,
+            performance_tracking: true,
+        }
+    }
+    
+    /// Create configuration based on game state
+    pub fn create_config_for_game(&self, board: &Board, snakes_count: usize, turn: i32) -> OpponentModelingConfig {
+        let mut config = self.default_config.clone();
+        
+        // Adjust based on game complexity
+        if snakes_count > 6 {
+            // More complex games - be more conservative
+            config.mode = OpponentModelingMode::Rational;
+            config.prediction_weight = 0.5;
+        } else if snakes_count <= 3 {
+            // Simple games - can be more aggressive with predictions
+            config.mode = OpponentModelingMode::Predicted;
+            config.prediction_weight = 0.9;
+        }
+        
+        // Adjust based on turn (early vs late game)
+        if turn > 100 {
+            // Late game - predictions more reliable
+            config.prediction_weight = (config.prediction_weight + 0.1).min(1.0);
+            config.confidence_threshold = (config.confidence_threshold - 0.1).max(0.3);
+        }
+        
+        config
+    }
+    
+    /// Enable/disable debug mode
+    pub fn set_debug_mode(&mut self, enabled: bool) {
+        self.debug_mode = enabled;
+    }
+    
+    /// Log opponent modeling decision for debugging
+    pub fn log_modeling_decision(&self, snake_id: &str, config: &OpponentModelingConfig, 
+                               confidence: f32, moves_evaluated: usize) {
+        if self.debug_mode {
+            info!("OPPONENT MODELING: Snake {} using {:?} mode (confidence: {:.2}, moves: {})",
+                  snake_id, config.mode, confidence, moves_evaluated);
+        }
+    }
+    
+    /// Performance metrics for opponent modeling
+    pub fn get_modeling_metrics(&self) -> OpponentModelingMetrics {
+        OpponentModelingMetrics {
+            cache_hit_rate: 0.0, // Would be calculated from actual cache stats
+            prediction_accuracy: 0.0, // Would be calculated from game results
+            modeling_overhead_ms: 0.0, // Would be calculated from timing
+            modes_used: vec![], // Would track which modes performed best
+        }
+    }
+}
+
+/// Performance metrics for opponent modeling system
+#[derive(Debug, Clone)]
+pub struct OpponentModelingMetrics {
+    pub cache_hit_rate: f32,
+    pub prediction_accuracy: f32,
+    pub modeling_overhead_ms: f32,
+    pub modes_used: Vec<OpponentModelingMode>,
+}
+
+impl OpponentModelingMetrics {
+    pub fn new() -> Self {
+        Self {
+            cache_hit_rate: 0.0,
+            prediction_accuracy: 0.0,
+            modeling_overhead_ms: 0.0,
+            modes_used: Vec::new(),
+        }
+    }
+    
+    /// Generate performance report
+    pub fn generate_report(&self) -> String {
+        format!("Opponent Modeling Performance Report:\n\
+                Cache Hit Rate: {:.1}%\n\
+                Prediction Accuracy: {:.1}%\n\
+                Modeling Overhead: {:.2}ms\n\
+                Modes Used: {:?}\n",
+                self.cache_hit_rate * 100.0,
+                self.prediction_accuracy * 100.0,
+                self.modeling_overhead_ms,
+                self.mode_used_summary())
+    }
+    
+    fn mode_used_summary(&self) -> String {
+        if self.modes_used.is_empty() {
+            "None".to_string()
+        } else {
+            let mut counts = HashMap::new();
+            for mode in &self.modes_used {
+                *counts.entry(format!("{:?}", mode)).or_insert(0) += 1;
+            }
+            counts.iter()
+                .map(|(mode, count)| format!("{}: {}", mode, count))
+                .collect::<Vec<_>>()
+                .join(", ")
+        }
+    }
+}
+
+/// Enhanced MinimaxDecisionMaker with opponent modeling support
+pub struct EnhancedMinimaxDecisionMaker {
+    max_depth: u8,
+    time_limit_ms: u128,
+    modeling_manager: OpponentModelingManager,
+    metrics: OpponentModelingMetrics,
+}
+
+impl EnhancedMinimaxDecisionMaker {
+    pub fn new() -> Self {
+        Self {
+            max_depth: 3,
+            time_limit_ms: 400,
+            modeling_manager: OpponentModelingManager::new(),
+            metrics: OpponentModelingMetrics::new(),
+        }
+    }
+    
+    pub fn with_config(max_depth: u8, time_limit_ms: u128, modeling_config: OpponentModelingConfig) -> Self {
+        let mut manager = OpponentModelingManager::new();
+        manager.default_config = modeling_config;
+        
+        Self {
+            max_depth,
+            time_limit_ms,
+            modeling_manager: manager,
+            metrics: OpponentModelingMetrics::new(),
+        }
+    }
+    
+    pub fn make_decision(&mut self, game: &Game, board: &Board, you: &Battlesnake) -> Value {
+        info!("ENHANCED MINIMAX DECISION: Starting search for snake {}", you.id);
+        
+        // Convert to simulation state with opponent modeling
+        let mut sim_state = GameSimulator::from_game_state(game, board, you);
+        sim_state.turn = 0;
+        
+        // Determine optimal modeling configuration for this game state
+        let modeling_config = self.modeling_manager.create_config_for_game(
+            board, board.snakes.len(), 0);
+        
+        // Enable opponent modeling if beneficial
+        let use_modeling = self.should_use_opponent_modeling(&modeling_config, board, you);
+        sim_state.opponent_modeling = use_modeling;
+        sim_state.modeling_config = modeling_config;
+        
+        // Estimate max snakes for transposition table sizing
+        let max_snakes = board.snakes.len().max(4);
+        let tt_size = (board.width as usize * board.height as usize * max_snakes).min(50000);
+        
+        // Create enhanced searcher with opponent modeling
+        let mut searcher = MinimaxSearcher::with_transposition_table(
+            self.max_depth, self.time_limit_ms, tt_size, board, max_snakes);
+        
+        let start_time = Instant::now();
+        let result = searcher.search_best_move(&mut sim_state, &you.id);
+        let search_time = start_time.elapsed().as_millis();
+        
+        let tt_stats = searcher.get_transposition_stats();
+        
+        // Log comprehensive decision information
+        info!("ENHANCED MINIMAX DECISION: Selected {:?} (eval: {:.2}, nodes: {}, TT hits: {}, TT hit rate: {:.1}%, {}ms, Opponent Model: {}, Confidence: {:.2})",
+              result.best_move, result.evaluation, result.nodes_searched, 
+              tt_stats.hits, tt_stats.hit_rate() * 100.0, search_time,
+              result.opponent_model_used, result.prediction_confidence);
+        
+        // Performance analysis
+        if self.modeling_manager.performance_tracking {
+            self.analyze_performance(&result, &sim_state);
+        }
+        
+        json!({ "move": format!("{:?}", result.best_move).to_lowercase() })
+    }
+    
+    /// Determine if opponent modeling should be used for this game state
+    fn should_use_opponent_modeling(&self, config: &OpponentModelingConfig, 
+                                  board: &Board, you: &Battlesnake) -> bool {
+        // Enable modeling if:
+        // 1. Multiple opponents present
+        // 2. Sufficient health to justify computation overhead
+        // 3. Not in immediate danger
+        // 4. Game state complex enough to benefit from modeling
+        
+        let opponent_count = board.snakes.len() - 1;
+        let has_opponents = opponent_count > 0;
+        let sufficient_health = you.health > 20;
+        let complex_enough = board.snakes.len() >= 2;
+        
+        has_opponents && sufficient_health && complex_enough && config.mode != OpponentModelingMode::Rational
+    }
+    
+    /// Analyze and track performance metrics
+    fn analyze_performance(&mut self, result: &SearchResult, state: &SimulatedGameState) {
+        // Update metrics based on search results
+        if result.opponent_model_used {
+            // Track modeling effectiveness
+            info!("OPPONENT MODELING ANALYSIS: Used={}, Confidence={:.2}, Cached={}, Time={}ms",
+                  result.opponent_model_used, result.prediction_confidence, 
+                  result.predictions_cached, result.time_taken_ms);
+        }
+        
+        // Log modeling configuration used
+        if self.modeling_manager.debug_mode {
+            info!("MODELING CONFIG: Mode={:?}, Weight={:.2}, Threshold={:.2}",
+                  state.modeling_config.mode, state.modeling_config.prediction_weight,
+                  state.modeling_config.confidence_threshold);
+        }
+    }
+    
+    /// Get current performance metrics
+    pub fn get_metrics(&self) -> &OpponentModelingMetrics {
+        &self.metrics
+    }
+    
+    /// Enable debug mode for detailed logging
+    pub fn enable_debug_mode(&mut self) {
+        self.modeling_manager.set_debug_mode(true);
+    }
+    
+    /// Generate comprehensive performance report
+    pub fn generate_performance_report(&self) -> String {
+        self.metrics.generate_report()
+    }
+}
+
+// ============================================================================
+// PHASE 2A: ZOBRIST HASHING FOR TRANSPOSITION TABLES
+// ============================================================================
+
+/// Zobrist hashing system for efficient game position identification
+pub struct ZobristHasher {
+    position_keys: Vec<Vec<u64>>,    // [x][y] -> random 64-bit value
+    health_keys: Vec<Vec<u64>>,      // [snake_index][health] -> random value
+    food_keys: Vec<u64>,             // [position_index] -> random value
+    turn_keys: Vec<u64>,             // [turn_mod] -> random value
+    snake_alive_keys: Vec<u64>,      // [snake_index] -> random value
+    board_width: i32,
+    board_height: i32,
+    max_snakes: usize,
+    max_health: i32,
+}
+
+impl ZobristHasher {
+    pub fn new(board_width: i32, board_height: u32, max_snakes: usize, max_health: i32) -> Self {
+        use rand::SeedableRng;
+        use rand::rngs::StdRng;
+        
+        let mut rng = StdRng::seed_from_u64(42); // Fixed seed for reproducible hashing
+        
+        let board_width_i32 = board_width as i32;
+        let board_height_i32 = board_height as i32;
+        
+        // Initialize position keys for all board positions
+        let mut position_keys = Vec::with_capacity(board_width_i32 as usize);
+        for x in 0..board_width_i32 {
+            let mut row = Vec::with_capacity(board_height_i32 as usize);
+            for y in 0..board_height_i32 {
+                row.push(rng.gen());
+            }
+            position_keys.push(row);
+        }
+        
+        // Initialize health keys for each snake and health level
+        let mut health_keys = Vec::with_capacity(max_snakes);
+        for _snake_idx in 0..max_snakes {
+            let mut health_row = Vec::with_capacity((max_health + 1) as usize);
+            for health in 0..=max_health {
+                health_row.push(rng.gen());
+            }
+            health_keys.push(health_row);
+        }
+        
+        // Initialize food keys (one per board position)
+        let mut food_keys = Vec::with_capacity((board_width_i32 * board_height_i32) as usize);
+        for _ in 0..(board_width_i32 * board_height_i32) {
+            food_keys.push(rng.gen());
+        }
+        
+        // Turn keys (modulo to keep table size reasonable)
+        let mut turn_keys = Vec::with_capacity(100); // 100 turn cycles
+        for _ in 0..100 {
+            turn_keys.push(rng.gen());
+        }
+        
+        // Snake alive/dead keys
+        let mut snake_alive_keys = Vec::with_capacity(max_snakes);
+        for _ in 0..max_snakes {
+            snake_alive_keys.push(rng.gen());
+        }
+        
+        Self {
+            position_keys,
+            health_keys,
+            food_keys,
+            turn_keys,
+            snake_alive_keys,
+            board_width: board_width_i32,
+            board_height: board_height_i32,
+            max_snakes,
+            max_health,
+        }
+    }
+    
+    /// Generate Zobrist hash for a game state
+    pub fn hash_state(&self, state: &SimulatedGameState) -> u64 {
+        let mut hash = 0u64;
+        
+        // Hash snake body positions and health
+        for (snake_idx, snake) in state.snakes.iter().enumerate() {
+            if snake_idx >= self.max_snakes {
+                break;
+            }
+            
+            // Hash each body segment
+            for &coord in &snake.body {
+                if coord.x >= 0 && coord.x < self.board_width && 
+                   coord.y >= 0 && coord.y < self.board_height {
+                    let pos_idx = (coord.y * self.board_width + coord.x) as usize;
+                    hash ^= self.position_keys[coord.x as usize][coord.y as usize];
+                }
+            }
+            
+            // Hash health (if within bounds)
+            if snake.health >= 0 && snake.health <= self.max_health {
+                hash ^= self.health_keys[snake_idx][snake.health as usize];
+            }
+            
+            // Hash alive/dead status
+            if snake.is_alive {
+                hash ^= self.snake_alive_keys[snake_idx];
+            }
+        }
+        
+        // Hash food positions
+        for &food_coord in &state.food {
+            if food_coord.x >= 0 && food_coord.x < self.board_width && 
+               food_coord.y >= 0 && food_coord.y < self.board_height {
+                let food_idx = (food_coord.y * self.board_width + food_coord.x) as usize;
+                hash ^= self.food_keys[food_idx];
+            }
+        }
+        
+        // Hash turn (modulo to prevent overflow)
+        let turn_idx = (state.turn as usize) % self.turn_keys.len();
+        hash ^= self.turn_keys[turn_idx];
+        
+        hash
+    }
+    
+    /// Create a hasher optimized for a specific board size
+    pub fn for_board(board: &Board, max_snakes: usize) -> Self {
+        Self::new(board.width, board.height, max_snakes, 100)
+    }
+}
+
+// ============================================================================
+// PHASE 2A: TRANSPOSITION TABLE IMPLEMENTATION
+// ============================================================================
+
+/// Entry types for transposition table storage
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum EntryType {
+    Exact,      // Exact evaluation
+    LowerBound, // Alpha cutoff (lower bound)
+    UpperBound, // Beta cutoff (upper bound)
+}
+
+/// Entry in the transposition table
+#[derive(Debug, Clone)]
+pub struct TranspositionEntry {
+    pub depth: u8,
+    pub evaluation: f32,
+    pub entry_type: EntryType,
+    pub best_move: Option<Direction>,
+    pub created_turn: u32,
+}
+
+/// Performance statistics for transposition table
+#[derive(Debug, Default, Clone)]
+pub struct TranspositionStats {
+    pub hits: u64,
+    pub misses: u64,
+    pub insertions: u64,
+    pub collisions: u64,
+    pub replacements: u64,
+}
+
+impl TranspositionStats {
+    pub fn hit_rate(&self) -> f32 {
+        if self.hits + self.misses == 0 {
+            0.0
+        } else {
+            self.hits as f32 / (self.hits + self.misses) as f32
+        }
+    }
+    
+    pub fn reset(&mut self) {
+        self.hits = 0;
+        self.misses = 0;
+        self.insertions = 0;
+        self.collisions = 0;
+        self.replacements = 0;
+    }
+}
+
+/// Transposition table for caching minimax evaluations
+pub struct TranspositionTable {
+    table: HashMap<u64, TranspositionEntry>,
+    max_size: usize,
+    stats: TranspositionStats,
+    current_turn: u32,
+    replacement_policy: ReplacementPolicy,
+}
+
+/// Replacement policies for when table is full
+#[derive(Debug, Clone, Copy)]
+pub enum ReplacementPolicy {
+    AlwaysReplace,     // Always replace existing entry
+    DepthPreferred,    // Replace if new depth is greater or equal
+    Aging,            // Use aging to prefer newer entries
+}
+
+impl TranspositionTable {
+    pub fn new(max_size: usize) -> Self {
+        Self {
+            table: HashMap::with_capacity(max_size),
+            max_size,
+            stats: TranspositionStats::default(),
+            current_turn: 0,
+            replacement_policy: ReplacementPolicy::DepthPreferred,
+        }
+    }
+    
+    /// Set replacement policy
+    pub fn with_policy(mut self, policy: ReplacementPolicy) -> Self {
+        self.replacement_policy = policy;
+        self
+    }
+    
+    /// Update current turn for aging
+    pub fn update_turn(&mut self, turn: u32) {
+        self.current_turn = turn;
+    }
+    
+    /// Lookup a position in the table
+    pub fn lookup(&mut self, hash: u64, depth: u8) -> Option<&TranspositionEntry> {
+        if let Some(entry) = self.table.get(&hash) {
+            // Check if entry is still useful
+            if entry.depth >= depth {
+                self.stats.hits += 1;
+                Some(entry)
+            } else {
+                self.stats.misses += 1;
+                None
+            }
+        } else {
+            self.stats.misses += 1;
+            None
+        }
+    }
+    
+    /// Insert a new entry into the table
+    pub fn insert(&mut self, hash: u64, entry: TranspositionEntry) {
+        self.stats.insertions += 1;
+        
+        // Check if we need to make space
+        if self.table.len() >= self.max_size {
+            self.handle_table_full(hash, entry);
+        } else {
+            self.table.insert(hash, entry);
+        }
+    }
+    
+    /// Handle table full scenario with replacement policy
+    fn handle_table_full(&mut self, hash: u64, new_entry: TranspositionEntry) {
+        match self.replacement_policy {
+            ReplacementPolicy::AlwaysReplace => {
+                // Simple replacement - just insert
+                self.table.insert(hash, new_entry);
+                self.stats.replacements += 1;
+            }
+            ReplacementPolicy::DepthPreferred => {
+                // Replace if new entry has equal or greater depth
+                if let Some((&old_hash, _old_entry)) = self.table.iter()
+                    .find(|(_, &ref old_entry)| old_entry.depth <= new_entry.depth) {
+                    self.table.remove(&old_hash);
+                    self.table.insert(hash, new_entry);
+                    self.stats.replacements += 1;
+                } else {
+                    // No suitable entry to replace, skip insertion
+                    self.stats.collisions += 1;
+                }
+            }
+            ReplacementPolicy::Aging => {
+                // Replace oldest entry
+                let &oldest_hash = self.table.iter()
+                    .min_by_key(|(_, entry)| entry.created_turn)
+                    .map(|(key, _)| key)
+                    .expect("Should have entries when table is full");
+                self.table.remove(&oldest_hash);
+                self.table.insert(hash, new_entry);
+                self.stats.replacements += 1;
+            }
+        }
+    }
+    
+    /// Get performance statistics
+    pub fn get_stats(&self) -> &TranspositionStats {
+        &self.stats
+    }
+    
+    /// Clear the table and reset statistics
+    pub fn clear(&mut self) {
+        self.table.clear();
+        self.stats.reset();
+    }
+    
+    /// Get current table size
+    pub fn size(&self) -> usize {
+        self.table.len()
+    }
+    
+    /// Get maximum table size
+    pub fn capacity(&self) -> usize {
+        self.max_size
     }
 }
 
@@ -1110,9 +1908,72 @@ impl PositionEvaluator for IntegratedEvaluator {
 }
 
 // ============================================================================
-// PHASE 2A: MINIMAX SEARCH ALGORITHM WITH ALPHA-BETA PRUNING (2A-3 & 2A-4)
+// PHASE 2B: ADVANCED OPPONENT MODELING INTEGRATION
 // ============================================================================
 
+/// Opponent modeling strategies for different adversarial scenarios
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum OpponentModelingMode {
+    Rational,     // Assumes perfect opponent optimization (current behavior)
+    Predicted,    // Uses Phase 1C predictions exclusively
+    Hybrid,       // Combines rational analysis with prediction weighting
+    Expectiminimax, // Probabilistic evaluation with predictions
+}
+
+/// Configuration for opponent modeling integration
+#[derive(Debug, Clone)]
+pub struct OpponentModelingConfig {
+    pub mode: OpponentModelingMode,
+    pub prediction_weight: f32,     // Weight given to predictions vs rational analysis
+    pub confidence_threshold: f32,  // Minimum confidence to use predictions
+    pub cache_predictions: bool,    // Cache predictions during search
+    pub max_cache_size: usize,      // Maximum number of cached predictions
+    pub use_predictions_for_ordering: bool, // Use predictions for move ordering
+    pub early_termination_threshold: f32,  // Early termination confidence
+}
+
+/// Cache for opponent predictions during search
+#[derive(Debug, Clone)]
+struct OpponentPredictionCache {
+    predictions: HashMap<String, HashMap<Direction, f32>>,
+    max_size: usize,
+    access_count: u64,
+}
+
+impl OpponentPredictionCache {
+    fn new(max_size: usize) -> Self {
+        Self {
+            predictions: HashMap::new(),
+            max_size,
+            access_count: 0,
+        }
+    }
+    
+    fn get_prediction(&mut self, snake_id: &str, board: &Board, all_snakes: &[Battlesnake]) -> Option<&HashMap<Direction, f32>> {
+        self.access_count += 1;
+        self.predictions.get(snake_id)
+    }
+    
+    fn store_prediction(&mut self, snake_id: String, predictions: HashMap<Direction, f32>) {
+        if self.predictions.len() >= self.max_size {
+            // Simple eviction: remove oldest entry
+            if let Some(key) = self.predictions.keys().next().cloned() {
+                self.predictions.remove(&key);
+            }
+        }
+        self.predictions.insert(snake_id, predictions);
+    }
+    
+    fn clear(&mut self) {
+        self.predictions.clear();
+    }
+    
+    fn size(&self) -> usize {
+        self.predictions.len()
+    }
+}
+
+/// Search results with opponent modeling statistics
 #[derive(Debug, Clone)]
 pub struct SearchResult {
     pub best_move: Direction,
@@ -1120,14 +1981,33 @@ pub struct SearchResult {
     pub nodes_searched: u64,
     pub time_taken_ms: u128,
     pub depth_reached: u8,
+    pub depth_achieved: u8,        // Final achieved depth (deepest completed)
+    pub iterations_completed: u8,  // Number of iterations completed
+    pub tt_hits: u64,
+    pub tt_misses: u64,
+    pub opponent_model_used: bool,    // Whether opponent modeling was used
+    pub prediction_confidence: f32,   // Average prediction confidence
+    pub predictions_cached: usize,    // Number of predictions cached
 }
 
+/// Opponent Modeling Integration State
 pub struct MinimaxSearcher {
     evaluator: IntegratedEvaluator,
     max_depth: u8,
     time_limit_ms: u128,
     nodes_searched: u64,
     start_time: Instant,
+    transposition_table: TranspositionTable,
+    zobrist_hasher: Option<ZobristHasher>,
+    tt_hits: u64,
+    tt_misses: u64,
+    
+    // Iterative Deepening Configuration
+    time_safety_buffer_ms: u128,    // Buffer for API response constraints (default: 50ms)
+    min_depth: u8,                  // Starting depth for iterative deepening (default: 1)
+    time_per_depth_history: Vec<(u8, u128)>, // Track time per depth for estimation
+    previous_best_move: Option<Direction>, // Best move from previous iteration
+    iterations_completed: u8,       // Count of completed iterations
 }
 
 impl MinimaxSearcher {
@@ -1138,15 +2018,66 @@ impl MinimaxSearcher {
             time_limit_ms,
             nodes_searched: 0,
             start_time: Instant::now(),
+            transposition_table: TranspositionTable::new(10000), // Default size
+            zobrist_hasher: None,
+            tt_hits: 0,
+            tt_misses: 0,
+            
+            // Iterative Deepening Configuration
+            time_safety_buffer_ms: 50,  // 50ms safety buffer for API response
+            min_depth: 1,               // Start from depth 1
+            time_per_depth_history: Vec::new(),
+            previous_best_move: None,
+            iterations_completed: 0,
         }
     }
     
-    // Main search entry point
+    /// Create searcher with specific transposition table configuration
+    pub fn with_transposition_table(max_depth: u8, time_limit_ms: u128,
+                                   tt_size: usize, board: &Board, max_snakes: usize) -> Self {
+        let hasher = ZobristHasher::for_board(board, max_snakes);
+        
+        Self {
+            evaluator: IntegratedEvaluator::new(),
+            max_depth,
+            time_limit_ms,
+            nodes_searched: 0,
+            start_time: Instant::now(),
+            transposition_table: TranspositionTable::new(tt_size).with_policy(ReplacementPolicy::DepthPreferred),
+            zobrist_hasher: Some(hasher),
+            tt_hits: 0,
+            tt_misses: 0,
+            
+            // Iterative Deepening Configuration
+            time_safety_buffer_ms: 50,  // 50ms safety buffer for API response
+            min_depth: 1,               // Start from depth 1
+            time_per_depth_history: Vec::new(),
+            previous_best_move: None,
+            iterations_completed: 0,
+        }
+    }
+    
+    /// Initialize Zobrist hasher if not already set
+    fn ensure_hasher(&mut self, board: &Board, max_snakes: usize) {
+        if self.zobrist_hasher.is_none() {
+            self.zobrist_hasher = Some(ZobristHasher::for_board(board, max_snakes));
+        }
+    }
+    
+    // Main search entry point - Iterative Deepening Implementation
     pub fn search_best_move(&mut self, state: &mut SimulatedGameState, our_snake_id: &str) -> SearchResult {
         self.nodes_searched = 0;
+        self.tt_hits = 0;
+        self.tt_misses = 0;
         self.start_time = Instant::now();
+        self.iterations_completed = 0;
+        self.previous_best_move = None;
+        self.time_per_depth_history.clear();
         
-        info!("MINIMAX SEARCH: Starting depth {} search for snake {}", self.max_depth, our_snake_id);
+        // Update transposition table turn counter
+        self.transposition_table.update_turn(state.turn as u32);
+        
+        info!("ITERATIVE DEEPENING: Starting search for snake {} (max depth: {})", our_snake_id, self.max_depth);
         
         // Generate our possible moves
         let our_snake_index = state.snakes.iter().position(|s| s.id == our_snake_id);
@@ -1158,16 +2089,96 @@ impl MinimaxSearcher {
                 nodes_searched: 0,
                 time_taken_ms: 0,
                 depth_reached: 0,
+                depth_achieved: 0,
+                iterations_completed: 0,
+                tt_hits: self.tt_hits,
+                tt_misses: self.tt_misses,
+                opponent_model_used: false,
+                prediction_confidence: 0.0,
+                predictions_cached: 0,
             };
         }
         
         let our_moves = GameSimulator::generate_moves_for_snake(&state.snakes[our_snake_index.unwrap()], state);
         let mut best_move = our_moves[0]; // Default fallback
         let mut best_evaluation = f32::NEG_INFINITY;
+        let mut deepest_achieved = self.min_depth - 1; // Track deepest completed depth
         
-        for &our_move in &our_moves {
+        // Iterative deepening loop
+        for current_depth in self.min_depth..=self.max_depth {
+            if self.should_stop_iteration() {
+                info!("ITERATIVE DEEPENING: Stopping at depth {} due to time constraints", current_depth);
+                break;
+            }
+            
+            let iteration_start = Instant::now();
+            let (depth_best_move, depth_best_evaluation) = self.search_at_depth(
+                &our_moves, state, our_snake_id, current_depth);
+            
+            let iteration_time = iteration_start.elapsed().as_millis();
+            
+            // Update best move if this depth produced a better evaluation
+            if depth_best_evaluation > best_evaluation {
+                best_evaluation = depth_best_evaluation;
+                best_move = depth_best_move;
+            }
+            
+            deepest_achieved = current_depth;
+            self.iterations_completed += 1;
+            self.previous_best_move = Some(best_move);
+            
+            // Store timing information for next iteration estimation
+            self.time_per_depth_history.push((current_depth, iteration_time));
+            if self.time_per_depth_history.len() > 10 {
+                self.time_per_depth_history.remove(0); // Keep only last 10 measurements
+            }
+            
+            info!("ITERATIVE DEEPENING: Depth {} completed in {}ms, best move: {:?}, evaluation: {:.2}",
+                  current_depth, iteration_time, best_move, best_evaluation);
+            
+            // Clear transposition table between iterations to ensure fresh search
+            // (or keep it for reuse - we'll keep it for better performance)
+            // self.clear_transposition_table();
+        }
+        
+        let time_taken = self.start_time.elapsed().as_millis();
+        let tt_hit_rate = if self.tt_hits + self.tt_misses > 0 {
+            self.tt_hits as f32 / (self.tt_hits + self.tt_misses) as f32
+        } else {
+            0.0
+        };
+        
+        info!("ITERATIVE DEEPENING: Completed. Iterations: {}, Final depth: {}, Best move: {:?}, Evaluation: {:.2}, Nodes: {}, TT Hits: {}, TT Hit Rate: {:.1}%, Time: {}ms",
+              self.iterations_completed, deepest_achieved, best_move, best_evaluation,
+              self.nodes_searched, self.tt_hits, tt_hit_rate * 100.0, time_taken);
+        
+        SearchResult {
+            best_move,
+            evaluation: best_evaluation,
+            nodes_searched: self.nodes_searched,
+            time_taken_ms: time_taken,
+            depth_reached: self.max_depth,
+            depth_achieved: deepest_achieved,
+            iterations_completed: self.iterations_completed,
+            tt_hits: self.tt_hits,
+            tt_misses: self.tt_misses,
+            opponent_model_used: false, // TODO: track this during search
+            prediction_confidence: 0.0, // TODO: calculate this during search
+            predictions_cached: 0, // TODO: track cache usage
+        }
+    }
+    
+    // Search at a specific depth (single iteration)
+    fn search_at_depth(&mut self, our_moves: &[Direction], state: &mut SimulatedGameState,
+                      our_snake_id: &str, depth: u8) -> (Direction, f32) {
+        let mut best_move = our_moves[0]; // Default fallback
+        let mut best_evaluation = f32::NEG_INFINITY;
+        
+        // Order moves: previous best move first for better pruning
+        let ordered_moves = self.order_moves(our_moves.to_vec(), self.previous_best_move);
+        
+        for &our_move in &ordered_moves {
             if self.is_time_up() {
-                info!("MINIMAX SEARCH: Time limit reached, stopping early");
                 break;
             }
             
@@ -1190,7 +2201,8 @@ impl MinimaxSearcher {
                     1, // Start at depth 1 since we just made our move
                     f32::NEG_INFINITY,
                     f32::INFINITY,
-                    false // Next level is minimizing (opponents turn)
+                    false, // Next level is minimizing (opponents turn)
+                    depth, // Use current iteration depth
                 );
                 
                 GameSimulator::undo_moves(state, &move_app);
@@ -1204,84 +2216,167 @@ impl MinimaxSearcher {
             }
         }
         
-        let time_taken = self.start_time.elapsed().as_millis();
-        info!("MINIMAX SEARCH: Completed. Best move: {:?}, Evaluation: {:.2}, Nodes: {}, Time: {}ms",
-              best_move, best_evaluation, self.nodes_searched, time_taken);
-        
-        SearchResult {
-            best_move,
-            evaluation: best_evaluation,
-            nodes_searched: self.nodes_searched,
-            time_taken_ms: time_taken,
-            depth_reached: self.max_depth,
-        }
+        (best_move, best_evaluation)
     }
     
-    // Core minimax algorithm with alpha-beta pruning
+    // Order moves with previous best move first for better alpha-beta pruning
+    fn order_moves(&self, mut moves: Vec<Direction>, previous_best: Option<Direction>) -> Vec<Direction> {
+        if let Some(prev_move) = previous_best {
+            if let Some(pos) = moves.iter().position(|&m| m == prev_move) {
+                moves.swap(0, pos);
+            }
+        }
+        moves
+    }
+    
+    // Check if we should stop current iteration based on time
+    fn should_stop_iteration(&self) -> bool {
+        let elapsed = self.start_time.elapsed().as_millis();
+        let time_limit = self.time_limit_ms.saturating_sub(self.time_safety_buffer_ms);
+        elapsed >= time_limit
+    }
+    
+    /// Core minimax algorithm with alpha-beta pruning and transposition table
     fn minimax(&mut self,
                state: &mut SimulatedGameState,
                our_snake_id: &str,
                depth: u8,
                mut alpha: f32,
                mut beta: f32,
-               maximizing: bool) -> f32 {
+               maximizing: bool,
+               max_depth: u8) -> f32 {
         
         self.nodes_searched += 1;
         
         // Terminal conditions
-        if depth >= self.max_depth || GameSimulator::is_terminal(state) || self.is_time_up() {
+        if depth >= max_depth || GameSimulator::is_terminal(state) || self.is_time_up() {
             return self.evaluator.evaluate_position(state, our_snake_id);
         }
         
-        if maximizing {
-            // Maximizing player (us or beneficial moves)
-            let mut max_eval = f32::NEG_INFINITY;
-            let move_combinations = GameSimulator::generate_all_moves(state);
-            
-            for moves in move_combinations {
-                if self.is_time_up() {
-                    break;
+        // Check transposition table first
+        if let Some(hasher) = &self.zobrist_hasher {
+            let hash = hasher.hash_state(state);
+            if let Some(entry) = self.transposition_table.lookup(hash, depth) {
+                self.tt_hits += 1;
+                
+                // Use cached evaluation based on entry type
+                match entry.entry_type {
+                    EntryType::Exact => {
+                        return entry.evaluation;
+                    }
+                    EntryType::LowerBound => {
+                        // Alpha cutoff - we can prune if evaluation >= beta
+                        if entry.evaluation >= beta {
+                            return entry.evaluation;
+                        }
+                        alpha = alpha.max(entry.evaluation);
+                    }
+                    EntryType::UpperBound => {
+                        // Beta cutoff - we can prune if evaluation <= alpha
+                        if entry.evaluation <= alpha {
+                            return entry.evaluation;
+                        }
+                        beta = beta.min(entry.evaluation);
+                    }
                 }
-                
-                let move_app = GameSimulator::apply_moves(state, &moves);
-                let eval = self.minimax(state, our_snake_id, depth + 1, alpha, beta, false);
-                GameSimulator::undo_moves(state, &move_app);
-                
-                max_eval = max_eval.max(eval);
-                alpha = alpha.max(eval);
-                
-                // Alpha-beta pruning
-                if beta <= alpha {
-                    break;
-                }
+            } else {
+                self.tt_misses += 1;
             }
-            
-            max_eval
+        }
+        
+        let evaluation = if maximizing {
+            // Maximizing player (us or beneficial moves)
+            self.minimax_maximize(state, our_snake_id, depth, alpha, beta, max_depth)
         } else {
             // Minimizing player (opponents or unfavorable moves)
-            let mut min_eval = f32::INFINITY;
-            let move_combinations = GameSimulator::generate_all_moves(state);
+            self.minimax_minimize(state, our_snake_id, depth, alpha, beta, max_depth)
+        };
+        
+        // Store result in transposition table
+        if let Some(hasher) = &self.zobrist_hasher {
+            let hash = hasher.hash_state(state);
+            let entry_type = if evaluation <= alpha {
+                EntryType::UpperBound // Beta didn't change
+            } else if evaluation >= beta {
+                EntryType::LowerBound // Alpha didn't change
+            } else {
+                EntryType::Exact // Both alpha and beta changed
+            };
             
-            for moves in move_combinations {
-                if self.is_time_up() {
-                    break;
-                }
-                
-                let move_app = GameSimulator::apply_moves(state, &moves);
-                let eval = self.minimax(state, our_snake_id, depth + 1, alpha, beta, true);
-                GameSimulator::undo_moves(state, &move_app);
-                
-                min_eval = min_eval.min(eval);
-                beta = beta.min(eval);
-                
-                // Alpha-beta pruning
-                if beta <= alpha {
-                    break;
-                }
+            self.transposition_table.insert(hash, TranspositionEntry {
+                depth,
+                evaluation,
+                entry_type,
+                best_move: None, // TODO: Store best move for this position
+                created_turn: self.transposition_table.current_turn,
+            });
+        }
+        
+        evaluation
+    }
+    
+    /// Maximizing player implementation
+    fn minimax_maximize(&mut self,
+                       state: &mut SimulatedGameState,
+                       our_snake_id: &str,
+                       depth: u8,
+                       mut alpha: f32,
+                       beta: f32,
+                       max_depth: u8) -> f32 {
+        let mut max_eval = f32::NEG_INFINITY;
+        let move_combinations = GameSimulator::generate_all_moves(state);
+        
+        for moves in move_combinations {
+            if self.is_time_up() {
+                break;
             }
             
-            min_eval
+            let move_app = GameSimulator::apply_moves(state, &moves);
+            let eval = self.minimax(state, our_snake_id, depth + 1, alpha, beta, false, max_depth);
+            GameSimulator::undo_moves(state, &move_app);
+            
+            max_eval = max_eval.max(eval);
+            alpha = alpha.max(eval);
+            
+            // Alpha-beta pruning
+            if beta <= alpha {
+                break;
+            }
         }
+        
+        max_eval
+    }
+    
+    /// Minimizing player implementation
+    fn minimax_minimize(&mut self,
+                       state: &mut SimulatedGameState,
+                       our_snake_id: &str,
+                       depth: u8,
+                       alpha: f32,
+                       mut beta: f32,
+                       max_depth: u8) -> f32 {
+        let mut min_eval = f32::INFINITY;
+        let move_combinations = GameSimulator::generate_all_moves(state);
+        
+        for moves in move_combinations {
+            if self.is_time_up() {
+                break;
+            }
+            
+            let move_app = GameSimulator::apply_moves(state, &moves);
+            let eval = self.minimax(state, our_snake_id, depth + 1, alpha, beta, true, max_depth);
+            GameSimulator::undo_moves(state, &move_app);
+            
+            min_eval = min_eval.min(eval);
+            beta = beta.min(eval);
+            
+            // Alpha-beta pruning
+            if beta <= alpha {
+                break;
+            }
+        }
+        
+        min_eval
     }
     
     // Generate move combinations where our snake makes a specific move
@@ -1341,6 +2436,16 @@ impl MinimaxSearcher {
     fn is_time_up(&self) -> bool {
         self.start_time.elapsed().as_millis() >= self.time_limit_ms
     }
+    
+    /// Get transposition table statistics
+    pub fn get_transposition_stats(&self) -> &TranspositionStats {
+        self.transposition_table.get_stats()
+    }
+    
+    /// Clear transposition table
+    pub fn clear_transposition_table(&mut self) {
+        self.transposition_table.clear();
+    }
 }
 
 // ============================================================================
@@ -1367,12 +2472,20 @@ impl MinimaxDecisionMaker {
         let mut sim_state = GameSimulator::from_game_state(game, board, you);
         sim_state.turn = 0; // Reset turn counter for search
         
-        // Create searcher and find best move
-        let mut searcher = MinimaxSearcher::new(self.max_depth, self.time_limit_ms);
-        let result = searcher.search_best_move(&mut sim_state, &you.id);
+        // Estimate max snakes for transposition table sizing
+        let max_snakes = board.snakes.len().max(4);
+        let tt_size = (board.width as usize * board.height as usize * max_snakes).min(50000);
         
-        info!("MINIMAX DECISION: Selected {:?} (eval: {:.2}, nodes: {}, {}ms)",
-              result.best_move, result.evaluation, result.nodes_searched, result.time_taken_ms);
+        // Create searcher with transposition table
+        let mut searcher = MinimaxSearcher::with_transposition_table(
+            self.max_depth, self.time_limit_ms, tt_size, board, max_snakes);
+        
+        let result = searcher.search_best_move(&mut sim_state, &you.id);
+        let tt_stats = searcher.get_transposition_stats();
+        
+        info!("MINIMAX DECISION: Selected {:?} (eval: {:.2}, nodes: {}, TT hits: {}, TT hit rate: {:.1}%, {}ms)",
+              result.best_move, result.evaluation, result.nodes_searched, 
+              tt_stats.hits, tt_stats.hit_rate() * 100.0, result.time_taken_ms);
         
         json!({ "move": format!("{:?}", result.best_move).to_lowercase() })
     }
