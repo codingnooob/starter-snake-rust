@@ -31,22 +31,22 @@ pub struct Board {
     hazards: Vec<Coord>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Battlesnake {
-    id: String,
-    name: String,
-    health: i32,
-    body: Vec<Coord>,
-    head: Coord,
-    length: i32,
-    latency: String,
-    shout: Option<String>,
+    pub id: String,
+    pub name: String,
+    pub health: i32,
+    pub body: Vec<Coord>,
+    pub head: Coord,
+    pub length: i32,
+    pub latency: String,
+    pub shout: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Coord {
-    x: i32,
-    y: i32,
+    pub x: i32,
+    pub y: i32,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
