@@ -4,8 +4,8 @@
 
 This project represents a comprehensive 34-phase evolution of a Battlesnake from basic heuristics to advanced multi-agent reinforcement learning systems. The evolution progresses through increasingly sophisticated AI techniques, culminating in a production-ready competitive Battlesnake.
 
-**Current Status: Phase 2A + Advanced Opponent Modeling Complete** ✅
-**Next Milestone: Phase 2B (MCTS) Implementation**
+**Current Status: Phase 2A + Phase 2B Complete** ✅
+**Next Milestone: Phase 3 Neural Network Integration**
 
 ---
 
@@ -19,8 +19,8 @@ This project represents a comprehensive 34-phase evolution of a Battlesnake from
 - Territorial evaluation with Voronoi-style mapping
 - Opponent movement prediction and strategic positioning
 
-### Phase 2: Search Algorithm Intelligence (✅ COMPLETE - 7/10 tasks complete)
-**Status: 7/10 tasks complete**
+### Phase 2: Search Algorithm Intelligence (✅ COMPLETE - 10/10 tasks complete)
+**Status: 10/10 tasks complete**
 - ✅ Minimax tree search with alpha-beta pruning
 - ✅ Game state simulation engine
 - ✅ Standardized evaluation function interface
@@ -28,7 +28,9 @@ This project represents a comprehensive 34-phase evolution of a Battlesnake from
 - ✅ Transposition tables implementation
 - ✅ Iterative deepening implementation
 - ✅ **Advanced Opponent Modeling Integration** - Sophisticated prediction-based adversarial reasoning
-- 🚧 Pending: Search diagnostics, comprehensive testing
+- ✅ **Search Diagnostics & Testing** - Comprehensive monitoring and unit test coverage
+- ✅ **MCTS Implementation** - Monte Carlo Tree Search with UCB1 selection and hybrid integration
+- ✅ **MCTS-Minimax Hybrid** - Intelligent strategy selection based on game complexity
 
 ### Phase 3: Supervised Machine Learning (⏳ PENDING)
 **Status: 0/5 tasks complete**
@@ -106,36 +108,48 @@ This project represents a comprehensive 34-phase evolution of a Battlesnake from
 - Strategic positioning for area denial and opponent cutting
 - Integration with existing safety and food seeking systems
 
-### ✅ Phase 2A: Minimax Search with Alpha-Beta Pruning + Advanced Opponent Modeling
-**Implementation:** `src/logic.rs` lines ~630-2500+
+### ✅ Phase 2A & 2B: Advanced Search Algorithm Intelligence + MCTS
+**Implementation:** `src/logic.rs` lines ~630-3500+
 **Key Components:**
 - `GameSimulator` - Complete game state simulation engine with prediction-based move generation
 - `MinimaxSearcher` - Alpha-beta pruning search algorithm with iterative deepening and transposition tables
+- `MCTSSearcher` - Monte Carlo Tree Search with UCB1 selection and path-based navigation
 - `IntegratedEvaluator` - Comprehensive position evaluation
-- `MinimaxDecisionMaker` - Production-ready decision interface
+- `MinimaxDecisionMaker` - Production-ready minimax decision interface
+- `MCTSDecisionMaker` - Production-ready MCTS decision interface
+- `HybridSearchManager` - Intelligent strategy selection between minimax and MCTS
 - **Advanced Opponent Modeling Integration** - Sophisticated probabilistic opponent modeling
 - `OpponentModelingManager` - Dynamic configuration and performance monitoring
 - `OpponentPredictionCache` - Performance optimization with LRU caching
 - **Expectiminimax** - Probabilistic minimax for uncertain opponent behavior
+- **Search Diagnostics & Testing** - Comprehensive monitoring with 21-unit test coverage
 
 **Technical Details:**
-- Multi-ply lookahead (3-5 moves) within 500ms API constraints
-- Game state simulation with move generation and undo capabilities
-- Alpha-beta pruning for search tree optimization
-- Iterative deepening for optimal time usage
-- Transposition tables with Zobrist hashing for search efficiency
-- **Opponent Modeling**: Phase 1C predictions integrated into minimax search
-- **Probabilistic Move Generation**: Replaces uniform opponent moves with prediction-based distributions
-- **Expectiminimax**: Probabilistic evaluation for uncertain opponent behavior
-- **Dynamic Configuration**: Adaptive modeling based on game state complexity
-- Time-bounded search with early termination
-- Hybrid fallback to territorial strategist for complex scenarios
+- **Phase 2A**: Multi-ply minimax lookahead (3-5 moves) within 500ms API constraints
+  - Alpha-beta pruning for search tree optimization
+  - Iterative deepening for optimal time usage
+  - Transposition tables with Zobrist hashing for search efficiency
+  - Opponent Modeling: Phase 1C predictions integrated into minimax search
+  - Probabilistic Move Generation: Prediction-based opponent move distributions
+  - Expectiminimax: Probabilistic evaluation for uncertain opponent behavior
+- **Phase 2B**: Complete Monte Carlo Tree Search implementation
+  - UCB1 (Upper Confidence Bound) selection with exploration constant C = √2
+  - Path-based tree navigation to avoid Rust borrowing conflicts
+  - Random rollout simulations with configurable depth limits
+  - Backpropagation using path-based tree traversal
+  - Time-bounded search (450ms safety buffer)
+  - Hybrid strategy selection based on game complexity
+- **Hybrid Intelligence**: Smart strategy selection between minimax and MCTS
+  - MCTS for complex multi-snake scenarios (>3 snakes, large boards)
+  - Minimax for simpler positions requiring deep tactical analysis
+- Time-bounded search with early termination for both algorithms
+- Comprehensive testing infrastructure (28 total unit tests)
 
 ---
 
 ## 🚧 Current Implementation Status
 
-### Recently Completed (Phase 2A + Advanced Integration)
+### Recently Completed (Phase 2A + Phase 2B Complete)
 1. **Game State Simulation Engine** - Complete move generation, application, and undo system
 2. **Standardized Evaluation Interface** - `PositionEvaluator` trait with integrated Phase 1 systems
 3. **Core Minimax Algorithm** - Depth-limited search with adversarial reasoning
@@ -143,11 +157,14 @@ This project represents a comprehensive 34-phase evolution of a Battlesnake from
 5. **Transposition Tables** - Position caching with Zobrist hashing for search efficiency
 6. **Iterative Deepening** - Progressive depth search for optimal time usage within API constraints
 7. **Advanced Opponent Modeling Integration** - Sophisticated probabilistic opponent modeling bridging Phase 1C predictions with Phase 2A minimax search
+8. **Search Diagnostics & Testing** - Comprehensive monitoring and 21-unit test coverage
+9. **MCTS Implementation** - Complete Monte Carlo Tree Search with UCB1 selection, rollout policies, and backpropagation
+10. **MCTS-Minimax Hybrid Integration** - Intelligent strategy selection based on game complexity
 
-### Immediate Next Steps (Phase 2A Polish)
-1. **Search Diagnostics** - Performance monitoring and decision logging systems
-2. **Comprehensive Testing** - Unit tests and search correctness validation
-3. **Phase 2B: MCTS Implementation** - Monte Carlo Tree Search for alternative search strategy
+### Immediate Next Steps (Phase 3 Preparation)
+1. **Phase 3: Neural Network Integration** - PyTorch training pipeline and ONNX model integration
+2. **Performance Benchmarking** - Compare MCTS vs minimax effectiveness across scenarios
+3. **Production Optimization** - Fine-tuning search parameters for competitive play
 
 ---
 
@@ -213,17 +230,12 @@ This project represents a comprehensive 34-phase evolution of a Battlesnake from
 4. **Opponent Modeling Integration** - Leverage Phase 1C predictions in minimax assumptions
 5. **Comprehensive Testing** - Unit tests for search correctness and edge cases
 
-### Phase 2B: Monte Carlo Tree Search (Medium Priority)
-1. **MCTS Node Structure** - Tree nodes with UCB1 selection
-2. **Rollout Policies** - Random and heuristic-guided simulations
-3. **Backpropagation** - Value updates through tree structure  
-4. **MCTS-Minimax Hybrid** - Combined search strategies for different scenarios
-
-### Phase 3: Neural Network Integration (Future Priority)
+### Phase 3: Supervised Machine Learning (Future Priority)
 1. **Python Training Pipeline** - PyTorch setup with game data collection
 2. **Position Evaluation Networks** - Deep neural networks for board evaluation
 3. **Move Prediction Networks** - Tactical planning with learned patterns
 4. **ONNX Export Pipeline** - Neural network integration with Rust inference
+5. **Training Data Generation** - Automated gameplay recording and labeling systems
 
 ---
 
@@ -296,7 +308,7 @@ battlesnake play -W 11 -H 11 --name 'Rust Starter Project' --url http://localhos
 
 ---
 
-**Last Updated:** November 11, 2025
-**Current Phase:** 2A + Advanced Opponent Modeling Complete (7/10 tasks)
-**Next Milestone:** Phase 2B MCTS Implementation → Phase 3 Neural Networks
+**Last Updated:** November 12, 2025
+**Current Phase:** 2A + 2B Complete (10/10 tasks)
+**Next Milestone:** Phase 3 Neural Network Integration → Phase 4 Reinforcement Learning
 **Contributors:** AI Agent Development Team
