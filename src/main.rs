@@ -9,6 +9,7 @@ use serde::Serialize;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::env;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 mod logic;
 
@@ -76,12 +77,54 @@ fn handle_start(start_req: Json<GameState>) -> Status {
 
 #[post("/move", format = "json", data = "<move_req>")]
 fn handle_move(move_req: Json<GameState>) -> Json<Value> {
+    // Generate unique request ID for tracking
+    let request_start = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis();
+    let request_id = format!("{}-{}", request_start, move_req.turn);
+    
+    info!("API REQUEST START: {} - Turn: {}, Snake: {} at ({}, {})",
+          request_id, move_req.turn, move_req.you.id, move_req.you.head.x, move_req.you.head.y);
+
     let response = logic::get_move(
         &move_req.game,
         &move_req.turn,
         &move_req.board,
         &move_req.you,
     );
+
+    // CRITICAL DEBUGGING: Add response validation and logging
+    let response_end = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis();
+    let response_time = response_end - request_start;
+    
+    let response_json = serde_json::to_string(&response).unwrap_or_default();
+    info!("API RESPONSE COMPLETE: {} - Processing time: {}ms, Raw response JSON: {}",
+          request_id, response_time, response_json);
+    
+    // Validate response structure
+    if let Some(move_field) = response.get("move") {
+        let move_str = move_field.as_str().unwrap_or("invalid");
+        info!("API RESPONSE VALIDATION: {} - Move field: '{}', Type: {}",
+              request_id, move_str, move_field);
+        
+        // Check for expected move values
+        match move_str {
+            "up" | "down" | "left" | "right" => {
+                info!("API RESPONSE SUCCESS: {} - Valid move '{}' detected", request_id, move_str);
+            },
+            _ => {
+                info!("API RESPONSE ERROR: {} - Invalid move value: '{}'", request_id, move_str);
+            }
+        }
+    } else {
+        info!("API RESPONSE ERROR: {} - No 'move' field found in response", request_id);
+        info!("API RESPONSE ERROR: {} - Available fields: {:?}",
+              request_id, response.as_object().map(|obj| obj.keys().collect::<Vec<_>>()).unwrap_or_default());
+    }
 
     Json(response)
 }

@@ -1,46 +1,76 @@
 {
   "game": {
-    "id": "test_game_123",
-    "ruleset": {"name": "standard", "version": "v1.0.17"},
-    "timeout": 500
+    "id": "test-game-123",
+    "ruleset": {
+      "name": "standard",
+      "version": "v1.0.0"
+    },
+    "timeout": 10000
   },
-  "turn": 3,
+  "turn": 0,
   "board": {
     "width": 11,
     "height": 11,
     "food": [
-      {"x": 5, "y": 5}
+      {
+        "x": 5,
+        "y": 5
+      }
     ],
     "snakes": [
       {
-        "id": "test-snake",
-        "name": "Test Snake",
+        "id": "neural-test-snake",
+        "name": "Neural Network Test",
         "health": 100,
         "body": [
-          {"x": 5, "y": 9},
-          {"x": 5, "y": 10},
-          {"x": 5, "y": 10}
+          {
+            "x": 5,
+            "y": 8
+          },
+          {
+            "x": 5,
+            "y": 9
+          },
+          {
+            "x": 5,
+            "y": 10
+          }
         ],
-        "head": {"x": 5, "y": 9},
+        "head": {
+          "x": 5,
+          "y": 8
+        },
         "length": 3,
         "latency": "100",
-        "shout": ""
+        "shout": null
       }
     ],
     "hazards": []
   },
   "you": {
-    "id": "test-snake",
-    "name": "Test Snake",
+    "id": "neural-test-snake",
+    "name": "Neural Network Test",
     "health": 100,
     "body": [
-      {"x": 5, "y": 9},
-      {"x": 5, "y": 10},
-      {"x": 5, "y": 10}
+      {
+        "x": 5,
+        "y": 8
+      },
+      {
+        "x": 5,
+        "y": 9
+      },
+      {
+        "x": 5,
+        "y": 10
+      }
     ],
-    "head": {"x": 5, "y": 9},
+    "head": {
+      "x": 5,
+      "y": 8
+    },
     "length": 3,
     "latency": "100",
-    "shout": ""
+    "shout": null
   }
 }

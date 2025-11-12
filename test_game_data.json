@@ -1,0 +1,1 @@
+'{"game": {"id": "test-game-123"}, "turn": 0, "board": {"width": 11, "height": 11, "food": [{"x": 5, "y": 5}], "snakes": [{"id": "neural-test-snake", "name": "Neural Network Test", "health": 100, "body": [{"x": 5, "y": 8}, {"x": 5, "y": 9}, {"x": 5, "y": 10}], "head": {"x": 5, "y": 8}, "length": 3}]}, "you": {"id": "neural-test-snake"}}' 

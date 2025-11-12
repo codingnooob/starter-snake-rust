@@ -20,3 +20,11 @@ serde_json = "1.0.59"
 log = "0.4.0"
 env_logger = "0.11.8"
 rand = { version = "0.9.1", features = ["std", "std_rng"] }
+
+# Neural Network Inference Dependencies
+onnxruntime = "0.0.14"
+ndarray = { version = "0.15", features = ["serde"] }
+anyhow = "1.0"
+thiserror = "1.0"
+parking_lot = "0.12"
+lazy_static = "1.4"

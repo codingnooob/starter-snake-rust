@@ -1,0 +1,593 @@
+// Neural Network Integration with MCTS/Minimax Hybrid System
+// Phase 3: Advanced AI Integration
+// 
+// This module integrates neural network predictions with the existing
+// search algorithms (MCTS and Minimax) to create a hybrid intelligence system.
+
+use crate::main::{Board, Battlesnake, Coord, Game};
+use crate::logic::{Direction, SafetyChecker, ReachabilityAnalyzer, FoodSeeker};
+use crate::neural_network::{NeuralNetworkEvaluator, get_neural_network_evaluator, NeuralNetworkType};
+use anyhow::Result;
+use std::sync::{Arc, Mutex};
+use log::{info, warn, debug};
+use parking_lot::RwLock;
+
+/// Snake type for neural network compatibility
+#[derive(Debug, Clone)]
+struct SnakeLike {
+    pub id: String,
+    pub health: i32,
+    pub body: Vec<Coord>,
+}
+
+/// Hybrid Intelligence Strategy Selection
+/// Determines when to use neural networks vs. traditional search algorithms
+#[derive(Debug, Clone)]
+pub enum IntelligenceStrategy {
+    NeuralNetworkOnly,
+    SearchOnly,
+    NeuralNetworkAssisted,
+    HybridFallback,
+    HeuristicOnly,
+}
+
+impl std::fmt::Display for IntelligenceStrategy {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            IntelligenceStrategy::NeuralNetworkOnly => write!(f, "NeuralNetworkOnly"),
+            IntelligenceStrategy::SearchOnly => write!(f, "SearchOnly"),
+            IntelligenceStrategy::NeuralNetworkAssisted => write!(f, "NeuralNetworkAssisted"),
+            IntelligenceStrategy::HybridFallback => write!(f, "HybridFallback"),
+            IntelligenceStrategy::HeuristicOnly => write!(f, "HeuristicOnly"),
+        }
+    }
+}
+
+/// Configuration for hybrid intelligence system
+#[derive(Debug, Clone)]
+pub struct HybridIntelligenceConfig {
+    pub strategy: IntelligenceStrategy,
+    pub neural_network_confidence_threshold: f32,
+    pub search_time_budget_ms: u64,
+    pub neural_network_time_budget_ms: u64,
+    pub fallback_enabled: bool,
+    pub max_search_depth: usize,
+    pub enable_ab_testing: bool,
+    pub ab_test_percentage: f32,
+}
+
+impl Default for HybridIntelligenceConfig {
+    fn default() -> Self {
+        Self {
+            strategy: IntelligenceStrategy::HybridFallback,
+            neural_network_confidence_threshold: 0.7,
+            search_time_budget_ms: 450, // Leave 50ms buffer for neural networks
+            neural_network_time_budget_ms: 50,
+            fallback_enabled: true,
+            max_search_depth: 3,
+            enable_ab_testing: false,
+            ab_test_percentage: 0.1, // 10% of games for A/B testing
+        }
+    }
+}
+
+/// Neural Network Assisted Position Evaluator
+/// Combines neural network predictions with traditional search evaluation
+pub struct NeuralNetworkSearchIntegrator {
+    config: Arc<RwLock<HybridIntelligenceConfig>>,
+    neural_evaluator: Arc<Mutex<NeuralNetworkEvaluator>>,
+    traditional_searcher: Arc<RwLock<HybridSearchManager>>,
+    performance_metrics: Arc<RwLock<PerformanceMetrics>>,
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct PerformanceMetrics {
+    pub neural_network_evaluations: u64,
+    pub traditional_search_evaluations: u64,
+    pub hybrid_evaluations: u64,
+    pub fallbacks_triggered: u64,
+    pub average_neural_time_ms: f64,
+    pub average_search_time_ms: f64,
+    pub win_rate_neural: f64,
+    pub win_rate_search: f64,
+    pub win_rate_hybrid: f64,
+}
+
+impl NeuralNetworkSearchIntegrator {
+    /// Create new hybrid integrator
+    pub fn new(config: HybridIntelligenceConfig) -> Self {
+        Self {
+            config: Arc::new(RwLock::new(config)),
+            neural_evaluator: get_neural_network_evaluator(),
+            traditional_searcher: Arc::new(RwLock::new(HybridSearchManager::new())),
+            performance_metrics: Arc::new(RwLock::new(PerformanceMetrics::default())),
+        }
+    }
+
+    /// Evaluate board position using hybrid intelligence
+    pub fn evaluate_position(&self, game: &Game, board: &Board, you: &Battlesnake) -> Result<f32> {
+        let config = self.config.read().clone();
+        
+        match config.strategy {
+            IntelligenceStrategy::NeuralNetworkOnly => {
+                self.evaluate_with_neural_network_only(board, you)
+            }
+            IntelligenceStrategy::SearchOnly => {
+                self.evaluate_with_search_only(board, you)
+            }
+            IntelligenceStrategy::NeuralNetworkAssisted => {
+                self.evaluate_with_neural_assisted_search(board, you, &config)
+            }
+            IntelligenceStrategy::HybridFallback => {
+                self.evaluate_with_hybrid_fallback(board, you, &config)
+            }
+            IntelligenceStrategy::HeuristicOnly => {
+                self.evaluate_with_heuristics_only(board, you)
+            }
+        }
+    }
+
+    /// Evaluate using only neural networks
+    fn evaluate_with_neural_network_only(&self, board: &Board, our_snake: &Battlesnake) -> Result<f32> {
+        let start_time = std::time::Instant::now();
+        
+        let evaluator = self.neural_evaluator.lock()
+            .map_err(|e| anyhow::anyhow!("Failed to lock neural evaluator: {}", e))?;
+        
+        // Convert Battlesnake to Snake-like format for neural network
+        let snake_like = Self::convert_to_snake_format(our_snake);
+        let result = evaluator.evaluate_position(board, &snake_like);
+        
+        // Update performance metrics
+        let elapsed = start_time.elapsed().as_millis() as f64;
+        {
+            let mut metrics = self.performance_metrics.write();
+            metrics.neural_network_evaluations += 1;
+            metrics.average_neural_time_ms =
+                (metrics.average_neural_time_ms * (metrics.neural_network_evaluations - 1) as f64 + elapsed)
+                / metrics.neural_network_evaluations as f64;
+        }
+        
+        result
+    }
+
+    /// Evaluate using only traditional search
+    fn evaluate_with_search_only(&self, board: &Board, our_snake: &Battlesnake) -> Result<f32> {
+        // Fallback to heuristic evaluation since search algorithms aren't properly integrated
+        let health_score = (our_snake.health as f32) / 100.0;
+        let space_score = 0.5;
+        let danger_penalty = 0.2;
+        
+        let score = (health_score + space_score - danger_penalty) * 2.0 - 1.0;
+        Ok(score)
+    }
+
+    /// Evaluate using neural network assisted search
+    fn evaluate_with_neural_assisted_search(
+        &self,
+        board: &Board,
+        our_snake: &Battlesnake,
+        config: &HybridIntelligenceConfig,
+    ) -> Result<f32> {
+        let evaluator = self.neural_evaluator.lock()
+            .map_err(|e| anyhow::anyhow!("Failed to lock neural evaluator: {}", e))?;
+        
+        // Get neural network evaluation
+        let snake_like = Self::convert_to_snake_format(our_snake);
+        let neural_score = evaluator.evaluate_position(board, &snake_like)?;
+        
+        // Get traditional search evaluation (fallback to heuristic)
+        let search_score = self.evaluate_with_search_only(board, our_snake)?;
+        
+        // Combine scores with weights
+        let neural_weight = 0.6; // 60% neural network, 40% search
+        let search_weight = 0.4;
+        
+        let combined_score = neural_score * neural_weight + search_score * search_weight;
+        
+        {
+            let mut metrics = self.performance_metrics.write();
+            metrics.hybrid_evaluations += 1;
+        }
+        
+        Ok(combined_score)
+    }
+
+    /// Evaluate with hybrid fallback mechanism
+    fn evaluate_with_hybrid_fallback(
+        &self,
+        board: &Board,
+        our_snake: &Battlesnake,
+        config: &HybridIntelligenceConfig,
+    ) -> Result<f32> {
+        let evaluator = self.neural_evaluator.lock()
+            .map_err(|e| anyhow::anyhow!("Failed to lock neural evaluator: {}", e))?;
+        
+        // Try neural network first
+        let snake_like = Self::convert_to_snake_format(our_snake);
+        if evaluator.inference_engine.is_model_loaded(&NeuralNetworkType::PositionEvaluation) {
+            match evaluator.evaluate_position(board, &snake_like) {
+                Ok(score) => {
+                    // Check confidence threshold
+                    let confidence = self.estimate_confidence(board, our_snake);
+                    if confidence >= config.neural_network_confidence_threshold {
+                        info!("Using neural network evaluation (confidence: {:.3})", confidence);
+                        return Ok(score);
+                    } else {
+                        warn!("Neural network confidence too low ({:.3}), falling back to search", confidence);
+                    }
+                }
+                Err(e) => {
+                    warn!("Neural network evaluation failed: {}, falling back to search", e);
+                }
+            }
+        } else {
+            warn!("Neural network models not loaded, falling back to search");
+        }
+        
+        // Fallback to traditional search
+        {
+            let mut metrics = self.performance_metrics.write();
+            metrics.fallbacks_triggered += 1;
+        }
+        
+        self.evaluate_with_search_only(board, our_snake)
+    }
+
+    /// Evaluate using only heuristics (fallback)
+    fn evaluate_with_heuristics_only(&self, board: &Board, our_snake: &Battlesnake) -> Result<f32> {
+        // Simple heuristic evaluation
+        let health_score = (our_snake.health as f32) / 100.0;
+        let space_score = 0.5;
+        let danger_penalty = 0.2;
+        
+        let score = (health_score + space_score - danger_penalty) * 2.0 - 1.0;
+        Ok(score)
+    }
+
+    /// Estimate confidence in neural network evaluation
+    fn estimate_confidence(&self, board: &Board, our_snake: &Battlesnake) -> f32 {
+        // Simple confidence estimation based on game state
+        let health_confidence = (our_snake.health as f32) / 100.0;
+        let safety_confidence = if our_snake.health > 80 { 1.0 } else { 0.5 };
+        let board_complexity_confidence = 1.0 / (board.snakes.len() as f32).max(1.0);
+        
+        (health_confidence * 0.4 + safety_confidence * 0.4 + board_complexity_confidence * 0.2)
+    }
+
+    /// Choose best move using hybrid intelligence
+    pub fn choose_best_move(&self, game: &Game, board: &Board, you: &Battlesnake, available_moves: &[Direction]) -> Result<Direction> {
+        let config = self.config.read().clone();
+        
+        match config.strategy {
+            IntelligenceStrategy::NeuralNetworkAssisted | IntelligenceStrategy::HybridFallback => {
+                self.choose_move_with_neural_assistance(board, you, available_moves, &config)
+            }
+            _ => {
+                self.choose_move_with_search(board, you, available_moves, &config)
+            }
+        }
+    }
+
+    /// Choose move using neural network assistance
+    fn choose_move_with_neural_assistance(
+        &self,
+        board: &Board,
+        our_snake: &Battlesnake,
+        available_moves: &[Direction],
+        config: &HybridIntelligenceConfig,
+    ) -> Result<Direction> {
+        let evaluator = self.neural_evaluator.lock()
+            .map_err(|e| anyhow::anyhow!("Failed to lock neural evaluator: {}", e))?;
+        
+        // Get move probabilities from neural network
+        let snake_like = Self::convert_to_snake_format(our_snake);
+        let move_probs = evaluator.get_move_probabilities(board, &snake_like)?;
+        
+        // Map probabilities to available moves
+        let mut scored_moves = Vec::new();
+        
+        for mv in available_moves.iter() {
+            let prob = match mv {
+                Direction::Up => move_probs[[0, 0]],
+                Direction::Down => move_probs[[0, 1]],
+                Direction::Left => move_probs[[0, 2]],
+                Direction::Right => move_probs[[0, 3]],
+            };
+            scored_moves.push((mv.clone(), prob));
+        }
+        
+        // Sort by probability and return best
+        scored_moves.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
+        
+        info!("Neural network move probabilities: {:?}", scored_moves);
+        Ok(scored_moves[0].0.clone())
+    }
+
+    /// Choose move using traditional search
+    fn choose_move_with_search(
+        &self,
+        board: &Board,
+        our_snake: &Battlesnake,
+        available_moves: &[Direction],
+        config: &HybridIntelligenceConfig,
+    ) -> Result<Direction> {
+        // Simple heuristic-based move selection
+        let snake_like = Self::convert_to_snake_format(our_snake);
+        let mut best_move = available_moves[0].clone();
+        let mut best_score = f32::NEG_INFINITY;
+        
+        for mv in available_moves {
+            let next_pos = our_snake.head.apply_direction(mv);
+            // Simple scoring based on safety and distance from food
+            let safety_score = if SafetyChecker::is_safe_coordinate(&next_pos, board, &board.snakes) { 1.0 } else { 0.0 };
+            let food_bonus = if !board.food.is_empty() {
+                let distance_to_food = board.food.iter()
+                    .map(|food| ((next_pos.x - food.x).abs() + (next_pos.y - food.y).abs()) as f32)
+                    .fold(f32::INFINITY, f32::min);
+                1.0 / (distance_to_food + 1.0)
+            } else { 0.0 };
+            
+            let score = safety_score + food_bonus;
+            if score > best_score {
+                best_score = score;
+                best_move = mv.clone();
+            }
+        }
+        
+        Ok(best_move)
+    }
+
+    /// Convert Battlesnake to Snake-like format for neural network compatibility
+    fn convert_to_snake_format(battlesnake: &Battlesnake) -> SnakeLike {
+        SnakeLike {
+            id: battlesnake.id.clone(),
+            health: battlesnake.health,
+            body: battlesnake.body.clone(),
+        }
+    }
+
+    /// Update configuration
+    pub fn update_config(&self, new_config: HybridIntelligenceConfig) {
+        let mut config = self.config.write();
+        *config = new_config;
+        info!("Updated hybrid intelligence configuration");
+    }
+
+    /// Get current configuration
+    pub fn get_config(&self) -> HybridIntelligenceConfig {
+        self.config.read().clone()
+    }
+
+    /// Get performance metrics
+    pub fn get_performance_metrics(&self) -> PerformanceMetrics {
+        self.performance_metrics.read().clone()
+    }
+
+    /// Reset performance metrics
+    pub fn reset_metrics(&self) {
+        let mut metrics = self.performance_metrics.write();
+        *metrics = PerformanceMetrics::default();
+    }
+}
+
+/// Model Validation and A/B Testing Framework
+pub struct ModelValidationFramework {
+    hybrid_integrator: Arc<RwLock<NeuralNetworkSearchIntegrator>>,
+    ab_test_active: Arc<RwLock<bool>>,
+    validation_results: Arc<RwLock<Vec<ValidationResult>>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ValidationResult {
+    pub game_id: String,
+    pub strategy_used: IntelligenceStrategy,
+    pub position_evaluations: u32,
+    pub final_score: i32,
+    pub game_outcome: String,
+    pub performance_metrics: PerformanceMetrics,
+    pub timestamp: String,
+}
+
+impl ModelValidationFramework {
+    /// Create new validation framework
+    pub fn new(hybrid_integrator: Arc<RwLock<NeuralNetworkSearchIntegrator>>) -> Self {
+        Self {
+            hybrid_integrator,
+            ab_test_active: Arc::new(RwLock::new(false)),
+            validation_results: Arc::new(RwLock::new(Vec::new())),
+        }
+    }
+
+    /// Start A/B testing
+    pub fn start_ab_testing(&self, percentage: f32) {
+        let mut active = self.ab_test_active.write();
+        *active = true;
+        
+        // Update configuration
+        let mut integrator = self.hybrid_integrator.write();
+        let mut config = integrator.get_config();
+        config.enable_ab_testing = true;
+        config.ab_test_percentage = percentage;
+        integrator.update_config(config);
+        
+        info!("Started A/B testing with {}% of games", percentage * 100.0);
+    }
+
+    /// Stop A/B testing
+    pub fn stop_ab_testing(&self) {
+        let mut active = self.ab_test_active.write();
+        *active = false;
+        
+        // Update configuration
+        let mut integrator = self.hybrid_integrator.write();
+        let mut config = integrator.get_config();
+        config.enable_ab_testing = false;
+        integrator.update_config(config);
+        
+        info!("Stopped A/B testing");
+    }
+
+    /// Validate model performance
+    pub fn validate_model_performance(&self) -> Result<ValidationReport> {
+        let results = self.validation_results.read();
+        
+        if results.is_empty() {
+            return Err(anyhow::anyhow!("No validation results available"));
+        }
+        
+        // Calculate statistics
+        let mut nn_evaluations = 0;
+        let mut search_evaluations = 0;
+        let mut hybrid_evaluations = 0;
+        let mut nn_wins = 0;
+        let mut search_wins = 0;
+        let mut hybrid_wins = 0;
+        
+        for result in results.iter() {
+            match result.strategy_used {
+                IntelligenceStrategy::NeuralNetworkOnly => {
+                    nn_evaluations += 1;
+                    if result.game_outcome == "win" { nn_wins += 1; }
+                }
+                IntelligenceStrategy::SearchOnly => {
+                    search_evaluations += 1;
+                    if result.game_outcome == "win" { search_wins += 1; }
+                }
+                IntelligenceStrategy::NeuralNetworkAssisted | IntelligenceStrategy::HybridFallback => {
+                    hybrid_evaluations += 1;
+                    if result.game_outcome == "win" { hybrid_wins += 1; }
+                }
+                _ => {}
+            }
+        }
+        
+        let nn_win_rate = if nn_evaluations > 0 { nn_wins as f64 / nn_evaluations as f64 } else { 0.0 };
+        let search_win_rate = if search_evaluations > 0 { search_wins as f64 / search_evaluations as f64 } else { 0.0 };
+        let hybrid_win_rate = if hybrid_evaluations > 0 { hybrid_wins as f64 / hybrid_evaluations as f64 } else { 0.0 };
+        
+        Ok(ValidationReport {
+            total_games: results.len(),
+            neural_network_games: nn_evaluations,
+            search_games: search_evaluations,
+            hybrid_games: hybrid_evaluations,
+            neural_network_win_rate: nn_win_rate,
+            search_win_rate: search_win_rate,
+            hybrid_win_rate: hybrid_win_rate,
+            recommendations: self.generate_recommendations(nn_win_rate, search_win_rate, hybrid_win_rate),
+        })
+    }
+
+    /// Generate recommendations based on performance
+    fn generate_recommendations(
+        &self,
+        nn_win_rate: f64,
+        search_win_rate: f64,
+        hybrid_win_rate: f64,
+    ) -> Vec<String> {
+        let mut recommendations = Vec::new();
+        
+        if hybrid_win_rate > nn_win_rate && hybrid_win_rate > search_win_rate {
+            recommendations.push("Hybrid strategy shows best performance. Continue using hybrid approach.".to_string());
+        } else if nn_win_rate > search_win_rate {
+            recommendations.push("Neural network strategy outperforms search. Consider prioritizing neural network evaluation.".to_string());
+        } else if search_win_rate > nn_win_rate {
+            recommendations.push("Search strategy outperforms neural network. Focus on improving neural network models or adjust confidence thresholds.".to_string());
+        } else {
+            recommendations.push("Performance is similar across strategies. Consider using hybrid approach for consistency.".to_string());
+        }
+        
+        if hybrid_win_rate - nn_win_rate > 0.1 {
+            recommendations.push("Significant improvement from hybrid approach. Neural networks should be used with search fallback.".to_string());
+        }
+        
+        recommendations
+    }
+
+    /// Record validation result
+    pub fn record_result(&self, result: ValidationResult) {
+        let mut results = self.validation_results.write();
+        results.push(result);
+        
+        // Keep only last 1000 results to prevent memory issues
+        if results.len() > 1000 {
+            results.drain(0..100);
+        }
+    }
+}
+
+/// Validation report structure
+#[derive(Debug, Clone)]
+pub struct ValidationReport {
+    pub total_games: usize,
+    pub neural_network_games: u32,
+    pub search_games: u32,
+    pub hybrid_games: u32,
+    pub neural_network_win_rate: f64,
+    pub search_win_rate: f64,
+    pub hybrid_win_rate: f64,
+    pub recommendations: Vec<String>,
+}
+
+/// Global hybrid intelligence system
+use lazy_static::lazy_static;
+lazy_static! {
+    static ref HYBRID_INTELLIGENCE_SYSTEM: Arc<RwLock<NeuralNetworkSearchIntegrator>> = {
+        Arc::new(RwLock::new(NeuralNetworkSearchIntegrator::new(HybridIntelligenceConfig::default())))
+    };
+}
+
+/// Get global hybrid intelligence system
+pub fn get_hybrid_intelligence_system() -> Arc<RwLock<NeuralNetworkSearchIntegrator>> {
+    HYBRID_INTELLIGENCE_SYSTEM.clone()
+}
+
+/// Initialize hybrid intelligence system
+pub fn initialize_hybrid_intelligence(config: HybridIntelligenceConfig) -> Result<()> {
+    let system = get_hybrid_intelligence_system();
+    let mut system = system.write();
+    
+    // Update configuration
+    system.update_config(config);
+    
+    info!("Hybrid intelligence system initialized");
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_intelligence_strategy_selection() {
+        let config = HybridIntelligenceConfig::default();
+        let integrator = NeuralNetworkSearchIntegrator::new(config);
+        
+        // Test configuration
+        assert_eq!(integrator.get_config().strategy, IntelligenceStrategy::HybridFallback);
+        assert!(integrator.get_config().fallback_enabled);
+    }
+
+    #[test]
+    fn test_confidence_estimation() {
+        let config = HybridIntelligenceConfig::default();
+        let integrator = NeuralNetworkSearchIntegrator::new(config);
+        
+        // Create test board and snake
+        let board = Board {
+            height: 11,
+            width: 11,
+            food: vec![],
+            snakes: vec![],
+        };
+        
+        let snake = Snake {
+            id: "test".to_string(),
+            health: 100,
+            body: vec![Coord { x: 5, y: 5 }],
+        };
+        
+        let confidence = integrator.estimate_confidence(&board, &snake);
+        assert!(confidence >= 0.0 && confidence <= 1.0);
+    }
+}
