@@ -1,0 +1,170 @@
+2025-11-12 12:59:23,178 - INFO - ✅ Server running on port 8888
+2025-11-12 12:59:23,179 - INFO - 🚀 Starting Neural Network Activation Pipeline
+2025-11-12 12:59:23,179 - INFO - Target: Achieve 5ms performance through model deployment
+2025-11-12 12:59:23,179 - INFO - 🔧 Setting up Python training environment...
+2025-11-12 12:59:23,613 - INFO - ✅ Server running on port 8888
+2025-11-12 12:59:23,613 - INFO - 🚀 Starting Neural Network Activation Pipeline
+2025-11-12 12:59:23,613 - INFO - Target: Achieve 5ms performance through model deployment
+2025-11-12 12:59:23,613 - INFO - 🔧 Setting up Python training environment...
+2025-11-12 12:59:26,151 - INFO - ✅ PyTorch 2.8.0+cu128 already installed
+2025-11-12 12:59:26,151 - INFO - ✅ PyTorch 2.8.0+cu128 already installed
+2025-11-12 12:59:26,204 - INFO - ✅ onnxruntime available
+2025-11-12 12:59:26,204 - INFO - ✅ onnxruntime available
+2025-11-12 12:59:26,204 - INFO - ✅ numpy available
+2025-11-12 12:59:26,204 - INFO - ✅ numpy available
+2025-11-12 12:59:26,671 - INFO - NumExpr defaulting to 16 threads.
+2025-11-12 12:59:26,671 - INFO - NumExpr defaulting to 16 threads.
+2025-11-12 12:59:26,947 - INFO - ✅ pandas available
+2025-11-12 12:59:26,947 - INFO - ✅ pandas available
+2025-11-12 12:59:27,084 - INFO - ✅ matplotlib available
+2025-11-12 12:59:27,084 - INFO - ✅ matplotlib available
+2025-11-12 12:59:27,084 - INFO - Installing missing dependencies: ['onnx', 'scikit-learn']
+2025-11-12 12:59:27,084 - INFO - Installing missing dependencies: ['onnx', 'scikit-learn']
+2025-11-12 12:59:31,324 - ERROR - ❌ Activation pipeline failed: Command '['/home/t/anaconda3/bin/python3', '-m', 'pip', 'install', 'onnx', 'scikit-learn']' returned non-zero exit status 1.
+2025-11-12 12:59:34,332 - INFO - ✅ Environment setup complete
+2025-11-12 12:59:34,332 - INFO - 📊 Generating training data from 100 game simulations...
+2025-11-12 12:59:34,573 - INFO - ✅ Collected 0 training samples
+2025-11-12 12:59:34,574 - INFO - ✅ Training data saved to training_data.pkl
+2025-11-12 12:59:34,574 - ERROR - ❌ No training data collected. Aborting.
+2025-11-12 13:03:35,397 - INFO - ✅ Server running on port 8888
+2025-11-12 13:03:35,397 - INFO - 🚀 Starting Neural Network Activation Pipeline
+2025-11-12 13:03:35,397 - INFO - Target: Achieve 5ms performance through model deployment
+2025-11-12 13:03:35,397 - INFO - 🔧 Verifying Python training environment...
+2025-11-12 13:03:36,293 - INFO - ✅ PyTorch 2.8.0+cu128 available
+2025-11-12 13:03:36,314 - INFO - ✅ ONNX 1.19.1 available
+2025-11-12 13:03:36,329 - INFO - ✅ ONNX Runtime 1.22.1 available
+2025-11-12 13:03:36,329 - INFO - ✅ NumPy 2.3.4 available
+2025-11-12 13:03:36,460 - INFO - NumExpr defaulting to 16 threads.
+2025-11-12 13:03:36,534 - INFO - ✅ Pandas 2.3.3 available
+2025-11-12 13:03:37,183 - INFO - ✅ Scikit-learn 1.7.2 available
+2025-11-12 13:03:37,183 - INFO - ✅ Environment verification complete
+2025-11-12 13:03:37,183 - INFO - 📊 Generating training data from 100 game simulations...
+2025-11-12 13:03:37,404 - INFO - ✅ Collected 0 training samples
+2025-11-12 13:03:37,405 - INFO - ✅ Training data saved to training_data.pkl
+2025-11-12 13:03:37,405 - ERROR - ❌ No training data collected. Aborting.
+2025-11-12 13:03:38,481 - INFO - ✅ Server running on port 8888
+2025-11-12 13:03:38,481 - INFO - 🚀 Starting Neural Network Activation Pipeline
+2025-11-12 13:03:38,481 - INFO - Target: Achieve 5ms performance through model deployment
+2025-11-12 13:03:38,481 - INFO - 🔧 Verifying Python training environment...
+2025-11-12 13:03:39,437 - INFO - ✅ PyTorch 2.8.0+cu128 available
+2025-11-12 13:03:39,461 - INFO - ✅ ONNX 1.19.1 available
+2025-11-12 13:03:39,476 - INFO - ✅ ONNX Runtime 1.22.1 available
+2025-11-12 13:03:39,477 - INFO - ✅ NumPy 2.3.4 available
+2025-11-12 13:03:39,677 - INFO - NumExpr defaulting to 16 threads.
+2025-11-12 13:03:39,776 - INFO - ✅ Pandas 2.3.3 available
+2025-11-12 13:03:40,078 - INFO - ✅ Scikit-learn 1.7.2 available
+2025-11-12 13:03:40,078 - INFO - ✅ Environment verification complete
+2025-11-12 13:03:40,079 - INFO - 📊 Generating training data from 100 game simulations...
+2025-11-12 13:03:40,354 - INFO - ✅ Collected 0 training samples
+2025-11-12 13:03:40,354 - INFO - ✅ Training data saved to training_data.pkl
+2025-11-12 13:03:40,355 - ERROR - ❌ No training data collected. Aborting.
+2025-11-12 13:05:45,721 - INFO - ✅ Server running on port 8888
+2025-11-12 13:05:45,721 - INFO - 🚀 Starting Neural Network Activation Pipeline
+2025-11-12 13:05:45,721 - INFO - Target: Achieve 5ms performance through model deployment
+2025-11-12 13:05:45,721 - INFO - 🔧 Verifying Python training environment...
+2025-11-12 13:05:46,174 - INFO - ✅ Server running on port 8888
+2025-11-12 13:05:46,174 - INFO - 🚀 Starting Neural Network Activation Pipeline
+2025-11-12 13:05:46,174 - INFO - Target: Achieve 5ms performance through model deployment
+2025-11-12 13:05:46,174 - INFO - 🔧 Verifying Python training environment...
+2025-11-12 13:05:46,814 - INFO - ✅ PyTorch 2.8.0+cu128 available
+2025-11-12 13:05:46,836 - INFO - ✅ ONNX 1.19.1 available
+2025-11-12 13:05:46,850 - INFO - ✅ ONNX Runtime 1.22.1 available
+2025-11-12 13:05:46,850 - INFO - ✅ NumPy 2.3.4 available
+2025-11-12 13:05:46,998 - INFO - NumExpr defaulting to 16 threads.
+2025-11-12 13:05:47,080 - INFO - ✅ Pandas 2.3.3 available
+2025-11-12 13:05:47,140 - INFO - ✅ PyTorch 2.8.0+cu128 available
+2025-11-12 13:05:47,156 - INFO - ✅ ONNX 1.19.1 available
+2025-11-12 13:05:47,172 - INFO - ✅ ONNX Runtime 1.22.1 available
+2025-11-12 13:05:47,172 - INFO - ✅ NumPy 2.3.4 available
+2025-11-12 13:05:47,311 - INFO - NumExpr defaulting to 16 threads.
+2025-11-12 13:05:47,373 - INFO - ✅ Scikit-learn 1.7.2 available
+2025-11-12 13:05:47,373 - INFO - ✅ Environment verification complete
+2025-11-12 13:05:47,373 - INFO - 📊 Generating training data from 100 game simulations...
+2025-11-12 13:05:47,401 - INFO - ✅ Pandas 2.3.3 available
+2025-11-12 13:05:47,625 - INFO - ✅ Collected 0 training samples
+2025-11-12 13:05:47,625 - INFO - ✅ Training data saved to training_data.pkl
+2025-11-12 13:05:47,626 - ERROR - ❌ No training data collected. Aborting.
+2025-11-12 13:05:47,747 - INFO - ✅ Scikit-learn 1.7.2 available
+2025-11-12 13:05:47,747 - INFO - ✅ Environment verification complete
+2025-11-12 13:05:47,748 - INFO - 📊 Generating training data from 100 game simulations...
+2025-11-12 13:05:48,086 - INFO - ✅ Collected 0 training samples
+2025-11-12 13:05:48,087 - INFO - ✅ Training data saved to training_data.pkl
+2025-11-12 13:05:48,087 - ERROR - ❌ No training data collected. Aborting.
+2025-11-12 13:06:04,474 - INFO - ✅ Server running on port 8888
+2025-11-12 13:06:04,474 - INFO - 🔍 Validating neural network deployment...
+2025-11-12 13:06:04,474 - ERROR - ❌ position_evaluation.onnx missing
+2025-11-12 13:06:04,474 - ERROR - ❌ move_prediction.onnx missing
+2025-11-12 13:06:04,474 - ERROR - ❌ game_outcome.onnx missing
+2025-11-12 13:06:04,474 - ERROR - ❌ Missing models: ['position_evaluation.onnx', 'move_prediction.onnx', 'game_outcome.onnx']
+2025-11-12 13:06:05,161 - INFO - ✅ Server running on port 8888
+2025-11-12 13:06:05,162 - INFO - 🔍 Validating neural network deployment...
+2025-11-12 13:06:05,162 - ERROR - ❌ position_evaluation.onnx missing
+2025-11-12 13:06:05,162 - ERROR - ❌ move_prediction.onnx missing
+2025-11-12 13:06:05,162 - ERROR - ❌ game_outcome.onnx missing
+2025-11-12 13:06:05,162 - ERROR - ❌ Missing models: ['position_evaluation.onnx', 'move_prediction.onnx', 'game_outcome.onnx']
+2025-11-12 13:21:30,803 - INFO - ✅ Server running on port 8888
+2025-11-12 13:21:30,804 - INFO - 🚀 Starting Neural Network Activation Pipeline
+2025-11-12 13:21:30,804 - INFO - Target: Achieve 5ms performance through model deployment
+2025-11-12 13:21:30,804 - INFO - 🔧 Setting up Python training environment...
+2025-11-12 13:21:31,248 - INFO - ✅ Server running on port 8888
+2025-11-12 13:21:31,248 - INFO - 🚀 Starting Neural Network Activation Pipeline
+2025-11-12 13:21:31,248 - INFO - Target: Achieve 5ms performance through model deployment
+2025-11-12 13:21:31,248 - INFO - 🔧 Setting up Python training environment...
+2025-11-12 13:21:31,795 - INFO - ✅ PyTorch 2.8.0+cu128 already installed
+2025-11-12 13:21:31,815 - INFO - ✅ onnx available
+2025-11-12 13:21:31,829 - INFO - ✅ onnxruntime available
+2025-11-12 13:21:31,829 - INFO - ✅ numpy available
+2025-11-12 13:21:31,967 - INFO - NumExpr defaulting to 16 threads.
+2025-11-12 13:21:32,047 - INFO - ✅ pandas available
+2025-11-12 13:21:32,099 - INFO - ✅ matplotlib available
+2025-11-12 13:21:32,099 - INFO - Installing missing dependencies: ['scikit-learn']
+2025-11-12 13:21:32,140 - INFO - ✅ PyTorch 2.8.0+cu128 already installed
+2025-11-12 13:21:32,162 - INFO - ✅ onnx available
+2025-11-12 13:21:32,181 - INFO - ✅ onnxruntime available
+2025-11-12 13:21:32,181 - INFO - ✅ numpy available
+2025-11-12 13:21:32,340 - INFO - NumExpr defaulting to 16 threads.
+2025-11-12 13:21:32,440 - INFO - ✅ pandas available
+2025-11-12 13:21:32,498 - INFO - ✅ matplotlib available
+2025-11-12 13:21:32,499 - INFO - Installing missing dependencies: ['scikit-learn']
+2025-11-12 13:21:32,909 - INFO - ✅ Environment setup complete
+2025-11-12 13:21:32,909 - INFO - 📊 Generating training data from 100 game simulations...
+2025-11-12 13:21:33,150 - INFO - ✅ Collected 0 training samples
+2025-11-12 13:21:33,150 - INFO - ✅ Training data saved to training_data.pkl
+2025-11-12 13:21:33,150 - ERROR - ❌ No training data collected. Aborting.
+2025-11-12 13:21:33,369 - INFO - ✅ Environment setup complete
+2025-11-12 13:21:33,369 - INFO - 📊 Generating training data from 100 game simulations...
+2025-11-12 13:21:33,626 - INFO - ✅ Collected 0 training samples
+2025-11-12 13:21:33,627 - INFO - ✅ Training data saved to training_data.pkl
+2025-11-12 13:21:33,627 - ERROR - ❌ No training data collected. Aborting.
+2025-11-12 13:21:48,227 - INFO - ✅ Server running on port 8888
+2025-11-12 13:21:48,228 - INFO - 🚀 Starting Neural Network Activation Pipeline
+2025-11-12 13:21:48,228 - INFO - Target: Achieve 5ms performance through model deployment
+2025-11-12 13:21:48,228 - INFO - 🔧 Verifying Python training environment...
+2025-11-12 13:21:49,211 - INFO - ✅ PyTorch 2.8.0+cu128 available
+2025-11-12 13:21:49,229 - INFO - ✅ ONNX 1.19.1 available
+2025-11-12 13:21:49,244 - INFO - ✅ ONNX Runtime 1.22.1 available
+2025-11-12 13:21:49,244 - INFO - ✅ NumPy 2.3.4 available
+2025-11-12 13:21:49,372 - INFO - NumExpr defaulting to 16 threads.
+2025-11-12 13:21:49,456 - INFO - ✅ Pandas 2.3.3 available
+2025-11-12 13:21:49,713 - INFO - ✅ Scikit-learn 1.7.2 available
+2025-11-12 13:21:49,713 - INFO - ✅ Environment verification complete
+2025-11-12 13:21:49,713 - INFO - 📊 Generating training data from 100 game simulations...
+2025-11-12 13:21:50,029 - INFO - ✅ Collected 0 training samples
+2025-11-12 13:21:50,030 - INFO - ✅ Training data saved to training_data.pkl
+2025-11-12 13:21:50,030 - ERROR - ❌ No training data collected. Aborting.
+2025-11-12 13:21:51,108 - INFO - ✅ Server running on port 8888
+2025-11-12 13:21:51,108 - INFO - 🚀 Starting Neural Network Activation Pipeline
+2025-11-12 13:21:51,108 - INFO - Target: Achieve 5ms performance through model deployment
+2025-11-12 13:21:51,108 - INFO - 🔧 Verifying Python training environment...
+2025-11-12 13:21:51,965 - INFO - ✅ PyTorch 2.8.0+cu128 available
+2025-11-12 13:21:51,985 - INFO - ✅ ONNX 1.19.1 available
+2025-11-12 13:21:52,000 - INFO - ✅ ONNX Runtime 1.22.1 available
+2025-11-12 13:21:52,000 - INFO - ✅ NumPy 2.3.4 available
+2025-11-12 13:21:52,144 - INFO - NumExpr defaulting to 16 threads.
+2025-11-12 13:21:52,242 - INFO - ✅ Pandas 2.3.3 available
+2025-11-12 13:21:52,499 - INFO - ✅ Scikit-learn 1.7.2 available
+2025-11-12 13:21:52,499 - INFO - ✅ Environment verification complete
+2025-11-12 13:21:52,500 - INFO - 📊 Generating training data from 100 game simulations...
+2025-11-12 13:21:52,745 - INFO - ✅ Collected 0 training samples
+2025-11-12 13:21:52,746 - INFO - ✅ Training data saved to training_data.pkl
+2025-11-12 13:21:52,746 - ERROR - ❌ No training data collected. Aborting.
