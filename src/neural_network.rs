@@ -342,7 +342,7 @@ impl BoardStateEncoder {
     }
 
     /// Encode board state for neural network input
-    pub fn encode_board_state(&self, board: &Board, our_snake: &Snake) -> NeuralNetworkInput {
+    pub fn encode_board_state(&self, board: &Board, our_snake: &Battlesnake) -> NeuralNetworkInput {
         let height = board.height as usize;
         let width = board.width as usize;
 
@@ -459,7 +459,7 @@ impl NeuralNetworkEvaluator {
     }
 
     /// Evaluate board position using neural networks
-    pub fn evaluate_position(&self, board: &Board, our_snake: &Snake) -> Result<f32> {
+    pub fn evaluate_position(&self, board: &Board, our_snake: &Battlesnake) -> Result<f32> {
         // Try neural network evaluation
         if self.inference_engine.is_model_loaded(&NeuralNetworkType::PositionEvaluation) {
             match self.evaluate_with_neural_network(board, our_snake) {
@@ -487,7 +487,7 @@ impl NeuralNetworkEvaluator {
     }
 
     /// Evaluate position using neural network
-    fn evaluate_with_neural_network(&self, board: &Board, our_snake: &Snake) -> Result<f32> {
+    fn evaluate_with_neural_network(&self, board: &Board, our_snake: &Battlesnake) -> Result<f32> {
         let input = self.board_encoder.encode_board_state(board, our_snake);
         let output = self.inference_engine.run_inference(&NeuralNetworkType::PositionEvaluation, &input)?;
         
@@ -497,7 +497,7 @@ impl NeuralNetworkEvaluator {
     }
 
     /// Get move probabilities using neural network
-    pub fn get_move_probabilities(&self, board: &Board, our_snake: &Snake) -> Result<Array2<f32>> {
+    pub fn get_move_probabilities(&self, board: &Board, our_snake: &Battlesnake) -> Result<Array2<f32>> {
         if self.inference_engine.is_model_loaded(&NeuralNetworkType::MovePrediction) {
             let input = self.board_encoder.encode_board_state(board, our_snake);
             let output = self.inference_engine.run_inference(&NeuralNetworkType::MovePrediction, &input)?;
@@ -514,7 +514,7 @@ impl NeuralNetworkEvaluator {
     }
 
     /// Get win probability for current position
-    pub fn get_win_probability(&self, board: &Board, our_snake: &Snake) -> Result<f32> {
+    pub fn get_win_probability(&self, board: &Board, our_snake: &Battlesnake) -> Result<f32> {
         if self.inference_engine.is_model_loaded(&NeuralNetworkType::GameOutcome) {
             let input = self.board_encoder.encode_board_state(board, our_snake);
             let output = self.inference_engine.run_inference(&NeuralNetworkType::GameOutcome, &input)?;
@@ -531,7 +531,7 @@ impl NeuralNetworkEvaluator {
     }
 
     /// Heuristic position evaluation (fallback)
-    fn heuristic_position_evaluation(&self, board: &Board, our_snake: &Snake) -> f32 {
+    fn heuristic_position_evaluation(&self, board: &Board, our_snake: &Battlesnake) -> f32 {
         // Simple heuristic: health + space advantage - danger
         let health_score = (our_snake.health as f32) / 100.0;
         
@@ -545,7 +545,7 @@ impl NeuralNetworkEvaluator {
     }
 
     /// Heuristic win probability (fallback)
-    fn heuristic_win_probability(&self, board: &Board, our_snake: &Snake) -> f32 {
+    fn heuristic_win_probability(&self, board: &Board, our_snake: &Battlesnake) -> f32 {
         // Simple heuristic based on health and snake length
         let health_factor = (our_snake.health as f32) / 100.0;
         let length_factor = (our_snake.body.len() as f32) / 10.0;
@@ -604,10 +604,15 @@ mod tests {
             snakes: vec![],
         };
         
-        let snake = Snake {
+        let snake = Battlesnake {
             id: "test".to_string(),
+            name: "test".to_string(),
             health: 100,
             body: vec![Coord { x: 5, y: 6 }, Coord { x: 5, y: 7 }],
+            head: Coord { x: 5, y: 6 },
+            length: 2,
+            latency: "0".to_string(),
+            shout: None,
         };
         
         let input = encoder.encode_board_state(&board, &snake);

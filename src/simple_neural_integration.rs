@@ -47,10 +47,10 @@ impl Default for PositionWeights {
 impl Default for MoveBiases {
     fn default() -> Self {
         Self {
-            up_bias: -0.1, // Reduce bias toward upward movement
-            down_bias: 0.05,
-            left_bias: 0.05,
-            right_bias: 0.05,
+            up_bias: 0.0,    // NEUTRAL: No bias toward upward movement
+            down_bias: 0.0,  // NEUTRAL: No bias toward downward movement
+            left_bias: 0.0,  // NEUTRAL: No bias toward left movement
+            right_bias: 0.0, // NEUTRAL: No bias toward right movement
         }
     }
 }
@@ -60,7 +60,7 @@ impl SimpleNeuralEvaluator {
         Self {
             position_weights: PositionWeights::default(),
             move_biases: MoveBiases::default(),
-            confidence_threshold: 0.3,
+            confidence_threshold: 0.25,
         }
     }
 

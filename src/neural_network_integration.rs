@@ -60,7 +60,7 @@ impl Default for HybridIntelligenceConfig {
     fn default() -> Self {
         Self {
             strategy: IntelligenceStrategy::HybridFallback,
-            neural_network_confidence_threshold: 0.7,
+            neural_network_confidence_threshold: 0.25,
             search_time_budget_ms: 450, // Leave 50ms buffer for neural networks
             neural_network_time_budget_ms: 50,
             fallback_enabled: true,

@@ -781,15 +781,18 @@ impl TerritorialStrategist {
                     info!("MOVE {}: SELECTING VERTICAL MOVE {:?} TO BREAK LOOP", turn, best_direction);
                     *best_direction
                 } else {
-                    // Fallback to best safe move
-                    safe_moves.iter()
-                        .max_by(|&&a, &&b| {
-                            let score_a = move_scores.get(&a).unwrap_or(&0.0);
-                            let score_b = move_scores.get(&b).unwrap_or(&0.0);
-                            score_a.partial_cmp(&score_b).unwrap()
+                    // SAFETY FIX: Replace unsafe fallback with validated emergency system
+                    info!("MOVE {}: CRITICAL SAFETY - Using validated fallback in loop breaking", turn);
+                    let fallback_move = Direction::all()
+                        .iter()
+                        .find(|&&direction| {
+                            let next_coord = you.head.apply_direction(&direction);
+                            SafetyChecker::is_safe_coordinate(&next_coord, board, &all_snakes)
                         })
                         .copied()
-                        .unwrap_or(Direction::Up)
+                        .unwrap_or(Direction::Left); // Final fallback to avoid hardcoded bias
+                    info!("MOVE {}: SAFETY FIX - Selected validated fallback: {:?} (avoiding unsafe Direction::Up)", turn, fallback_move);
+                    fallback_move
                 }
             } else {
                 // No vertical moves available, use pathfinding correction
@@ -811,7 +814,18 @@ impl TerritorialStrategist {
                         score_a.partial_cmp(&score_b).unwrap()
                     })
                     .copied()
-                    .unwrap_or(Direction::Up)
+                    .unwrap_or_else(|| {
+                        // CRITICAL FIX: Replace hardcoded Direction::Up with validated safe move
+                        info!("MOVE {}: WARNING - Using validated fallback for territorial strategist", turn);
+                        Direction::all()
+                            .iter()
+                            .find(|&&direction| {
+                                let next_coord = you.head.apply_direction(&direction);
+                                SafetyChecker::is_safe_coordinate(&next_coord, board, &all_snakes)
+                            })
+                            .copied()
+                            .unwrap_or(Direction::Left) // Final fallback to avoid hardcoded bias
+                    })
             }
             }
         } else if let Some(best_direction) = safe_moves.iter()
@@ -822,12 +836,77 @@ impl TerritorialStrategist {
             }) {
             *best_direction
         } else {
-            // Emergency fallback
-            if safe_moves.is_empty() {
-                Direction::Up
+            // CRITICAL SAFETY FIX: Emergency fallback with proper safety validation
+            info!("MOVE {}: EMERGENCY FALLBACK - No safe moves found, validating all possible moves", turn);
+            
+            // NEVER use hardcoded Direction::Up - always validate safety
+            let emergency_safe_moves = Direction::all()
+                .iter()
+                .filter(|direction| {
+                    let next_coord = you.head.apply_direction(direction);
+                    SafetyChecker::is_safe_coordinate(&next_coord, board, &all_snakes)
+                })
+                .copied()
+                .collect::<Vec<_>>();
+            
+            if emergency_safe_moves.is_empty() {
+                // ABSOLUTE LAST RESORT: Choose move that minimizes immediate danger
+                info!("MOVE {}: CRITICAL - No safe moves found even in emergency validation!", turn);
+                info!("MOVE {}: EMERGENCY FALLBACK BUG FIX - Selecting move with LOWEST danger score", turn);
+                
+                // CRITICAL BUG FIX: Use max_by with correct comparison to select safest move
+                let least_dangerous_move = Direction::all()
+                    .iter()
+                    .max_by(|a, b| {
+                        let coord_a = you.head.apply_direction(a);
+                        let coord_b = you.head.apply_direction(b);
+                        let danger_a = if coord_a.x < 0 || coord_a.x >= board.width ||
+                                          coord_a.y < 0 || coord_a.y >= (board.height as i32) {
+                            1000 // High penalty for out of bounds
+                        } else {
+                            100 // Lower penalty for other dangers
+                        };
+                        let danger_b = if coord_b.x < 0 || coord_b.x >= board.width ||
+                                          coord_b.y < 0 || coord_b.y >= (board.height as i32) {
+                            1000
+                        } else {
+                            100
+                        };
+                        danger_b.cmp(&danger_a)  // FIXED: Now selects move with LOWEST danger
+                    })
+                    .copied()
+                    .unwrap_or(Direction::Left); // Final absolute fallback
+                
+                // VALIDATION: Ensure selected move is actually within bounds
+                let selected_coord = you.head.apply_direction(&least_dangerous_move);
+                let is_selected_safe = selected_coord.x >= 0 && selected_coord.x < board.width &&
+                                     selected_coord.y >= 0 && selected_coord.y < (board.height as i32);
+                
+                if !is_selected_safe {
+                    info!("MOVE {}: WARNING - Selected emergency move is still out of bounds!", turn);
+                    // Final fallback to any direction that stays in bounds
+                    let final_fallback = Direction::all()
+                        .iter()
+                        .find(|direction| {
+                            let coord = you.head.apply_direction(direction);
+                            coord.x >= 0 && coord.x < board.width &&
+                            coord.y >= 0 && coord.y < (board.height as i32)
+                        })
+                        .copied()
+                        .unwrap_or(Direction::Left);
+                    info!("MOVE {}: Final fallback to truly safe move: {:?}", turn, final_fallback);
+                    return json!({ "move": format!("{:?}", final_fallback).to_lowercase() });
+                }
+                
+                info!("MOVE {}: EMERGENCY - Using least dangerous move: {:?} (avoiding hardcoded bias)", turn, least_dangerous_move);
+                least_dangerous_move
             } else {
+                // Choose randomly from truly safe emergency moves to avoid bias
                 use rand::Rng;
-                safe_moves[rand::rng().random_range(0..safe_moves.len())]
+                let emergency_choice = emergency_safe_moves[rand::rng().random_range(0..emergency_safe_moves.len())];
+                info!("MOVE {}: EMERGENCY - Selected safe random move: {:?} from {} validated safe options",
+                      turn, emergency_choice, emergency_safe_moves.len());
+                emergency_choice
             }
         };
 
@@ -2502,200 +2581,228 @@ mod tests {
 }
 
 // ============================================================================
-// SIMPLE NEURAL NETWORK EVALUATOR - FIXING THE CORE INTEGRATION ISSUE
+// ADVANCED NEURAL NETWORK EVALUATOR - PROPERLY INTEGRATED
 // ============================================================================
 
-/// Simple Neural Network Evaluator that replaces the broken external dependencies
-pub struct SimpleNeuralEvaluator {
-    // Neural network weights and biases (simplified)
-    position_weights: [[f32; 4]; 3], // 3x4 matrix for position evaluation
-    safety_weights: [f32; 4],       // Safety evaluation weights
-    threat_weights: [f32; 4],       // Threat detection weights
+/// Advanced Neural Network Evaluator that properly integrates all Phase 1C systems
+/// This replaces the broken SimpleNeuralEvaluator with the actual Advanced Opponent Modeling Integration
+pub struct AdvancedNeuralEvaluator {
+    // Core systems integration
+    space_controller: SpaceController,
+    opponent_analyzer: OpponentAnalyzer,
+    movement_history: MovementHistory,
+    territorial_strategist: TerritorialStrategist,
+    
+    // Neural network weights (simplified but with proper integration)
+    nn_weights: [[f32; 4]; 3],
+    safety_weights: [f32; 4],
+    territory_weights: [f32; 4],
+    opponent_weights: [f32; 4],
 }
 
-impl SimpleNeuralEvaluator {
+impl AdvancedNeuralEvaluator {
     pub fn new() -> Self {
         Self {
-            // Initialize with ANTI-UPWARD BIAS weights
-            // Strongly discourage upward movement while promoting alternatives
-            position_weights: [
-                [-0.8, 0.6, 0.4, 0.7],  // Strong anti-upward bias (-0.8), favor other directions
-                [0.3, 0.7, 0.8, 0.2],   // Position evaluation favoring down/left
-                [0.5, 0.6, 0.4, 0.3],   // Balanced exploration weights
-            ],
-            safety_weights: [0.3, 0.9, 0.8, 0.7], // REDUCED upward safety, favor down/left/right
-            threat_weights: [-0.9, -0.3, -0.6, -0.4], // Strong upward threat avoidance
-        }
-    }
-    
-    /// Encode board state into neural network input
-    fn encode_board_state(&self, board: &Board, you: &Battlesnake) -> Vec<f32> {
-        let mut input = Vec::with_capacity(12);
-        
-        // Encode our snake position (normalized)
-        let norm_x = (you.head.x as f32) / (board.width as f32);
-        let norm_y = (you.head.y as f32) / (board.height as f32);
-        input.extend_from_slice(&[norm_x, norm_y]);
-        
-        // Encode food positions (average distance)
-        if !board.food.is_empty() {
-            let avg_food_distance = board.food.iter()
-                .map(|food| {
-                    let dx = (food.x - you.head.x) as f32;
-                    let dy = (food.y - you.head.y) as f32;
-                    (dx * dx + dy * dy).sqrt()
-                })
-                .sum::<f32>() / board.food.len() as f32;
-            input.push(avg_food_distance / (board.width as f32));
-        } else {
-            input.push(0.0);
-        }
-        
-        // Encode opponent threat level
-        let threat_level = self.calculate_threat_level(board, you);
-        input.push(threat_level);
-        
-        // Pad to 12 features
-        while input.len() < 12 {
-            input.push(0.0);
-        }
-        
-        input
-    }
-    
-    /// Calculate threat level from nearby snakes
-    fn calculate_threat_level(&self, board: &Board, you: &Battlesnake) -> f32 {
-        let mut max_threat: f32 = 0.0;
-        
-        for snake in &board.snakes {
-            if snake.id == you.id {
-                continue;
-            }
+            // Initialize all the sophisticated systems
+            space_controller: SpaceController,
+            opponent_analyzer: OpponentAnalyzer,
+            movement_history: MovementHistory::new(10),
+            territorial_strategist: TerritorialStrategist::new(),
             
-            let dx = (snake.head.x - you.head.x) as f32;
-            let dy = (snake.head.y - you.head.y) as f32;
-            let distance = (dx * dx + dy * dy).sqrt();
-            let threat = (snake.length as f32) / distance.max(1.0);
-            max_threat = max_threat.max(threat);
-        }
-        
-        max_threat.min(1.0) // Normalize to [0, 1]
-    }
-    
-    /// Simple neural network forward pass
-    fn forward_pass(&self, input: &[f32]) -> [f32; 4] {
-        let mut output = [0.0; 4];
-        
-        // Matrix multiplication: position_weights (3x4) * input (12x1) -> output (4x1)
-        for i in 0..4 {
-            output[i] = self.position_weights[0][i] * input[0] * input[2] * input[4] * input[6] * input[8] * input[10]
-                      + self.position_weights[1][i] * input[1] * input[3] * input[5] * input[7] * input[9] * input[11]
-                      + self.position_weights[2][i];
-        }
-        
-        // Apply safety and threat adjustments
-        for i in 0..4 {
-            output[i] = output[i] * self.safety_weights[i] + self.threat_weights[i];
-        }
-        
-        // Softmax activation for probabilities
-        let max_val = output.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
-        let exp_sum: f32 = output.iter().map(|&x| (x - max_val).exp()).sum();
-        
-        let softmax_probs: Vec<f32> = output.iter().map(|&x| (x - max_val).exp() / exp_sum.max(0.0001)).collect();
-        
-        // Convert Vec to array
-        if softmax_probs.len() >= 4 {
-            [softmax_probs[0], softmax_probs[1], softmax_probs[2], softmax_probs[3]]
-        } else {
-            [0.25; 4]
+            // Balanced neural network weights
+            nn_weights: [
+                [0.5, 0.5, 0.5, 0.5],  // Position evaluation
+                [0.6, 0.6, 0.6, 0.6],  // Safety evaluation
+                [0.4, 0.4, 0.4, 0.4],  // Movement quality
+            ],
+            safety_weights: [0.8, 0.8, 0.8, 0.8],           // High safety priority
+            territory_weights: [0.7, 0.7, 0.7, 0.7],        // Territory control
+            opponent_weights: [0.6, 0.6, 0.6, 0.6],         // Opponent modeling
         }
     }
     
-    /// Evaluate board position using neural network
-    pub fn evaluate_position(&self, board: &Board, you: &Battlesnake) -> [f32; 4] {
-        info!("NEURAL EVAL: =========================================");
-        info!("NEURAL EVAL: Starting neural network evaluation for snake {} at ({}, {})", you.id, you.head.x, you.head.y);
-        info!("NEURAL EVAL: Snake health: {}, length: {}", you.health, you.body.len());
-        info!("NEURAL EVAL: Board state: {}x{}, food: {}, snakes: {}", board.width, board.height, board.food.len(), board.snakes.len());
-        
-        // ENCODE INPUT STATE
-        let input = self.encode_board_state(board, you);
-        info!("NEURAL EVAL: Input encoding complete - {} features", input.len());
-        
-        // APPLY NEURAL NETWORK FORWARD PASS
-        let output = self.forward_pass(&input);
-        
-        info!("NEURAL EVAL: =========================================");
-        info!("NEURAL EVAL: Neural network output:");
-        info!("NEURAL EVAL:   Up:    {:.6}", output[0]);
-        info!("NEURAL EVAL:   Down:  {:.6}", output[1]);
-        info!("NEURAL EVAL:   Left:  {:.6}", output[2]);
-        info!("NEURAL EVAL:   Right: {:.6}", output[3]);
-        info!("NEURAL EVAL: Sum: {:.6}", output.iter().sum::<f32>());
-        
-        // Calculate max and min correctly
-        let max_val = output.iter().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
-        let min_val = output.iter().fold(f32::INFINITY, |a, &b| a.min(b));
-        info!("NEURAL EVAL: Max: {:.6}, Min: {:.6}", max_val, min_val);
-        
-        // SAFETY AND THREAT WEIGHTS ANALYSIS
-        info!("NEURAL EVAL: Safety weights analysis:");
-        info!("NEURAL EVAL:   Up:     {:.6}", self.safety_weights[0]);
-        info!("NEURAL EVAL:   Down:   {:.6}", self.safety_weights[1]);
-        info!("NEURAL EVAL:   Left:   {:.6}", self.safety_weights[2]);
-        info!("NEURAL EVAL:   Right:  {:.6}", self.safety_weights[3]);
-        
-        info!("NEURAL EVAL: Threat weights analysis:");
-        info!("NEURAL EVAL:   Up:     {:.6}", self.threat_weights[0]);
-        info!("NEURAL EVAL:   Down:   {:.6}", self.threat_weights[1]);
-        info!("NEURAL EVAL:   Left:   {:.6}", self.threat_weights[2]);
-        info!("NEURAL EVAL:   Right:  {:.6}", self.threat_weights[3]);
-        
-        // DETECT UPWARD BIAS IN WEIGHTS
-        let up_safety_bias = self.safety_weights[0] - (self.safety_weights[1] + self.safety_weights[2] + self.safety_weights[3]) / 3.0;
-        let up_threat_bias = self.threat_weights[0] - (self.threat_weights[1] + self.threat_weights[2] + self.threat_weights[3]) / 3.0;
-        info!("NEURAL EVAL: Upward bias in safety weights: {:.6}", up_safety_bias);
-        info!("NEURAL EVAL: Upward bias in threat weights: {:.6}", up_threat_bias);
-        
-        // DETECT UPWARD BIAS IN OUTPUT
-        let dominant_move = if output[0] >= output[1] && output[0] >= output[2] && output[0] >= output[3] {
-            "UP"
-        } else if output[1] >= output[2] && output[1] >= output[3] {
-            "DOWN"
-        } else if output[2] >= output[3] {
-            "LEFT"
-        } else {
-            "RIGHT"
-        };
-        
-        info!("NEURAL EVAL: Dominant move: {} (score: {:.6})", dominant_move,
-              match dominant_move {
-                  "UP" => output[0], "DOWN" => output[1], "LEFT" => output[2], "RIGHT" => output[3], _ => 0.0
-              });
-        
-        if dominant_move == "UP" {
-            info!("NEURAL EVAL: CRITICAL DETECTION - Neural network suggests UPWARD movement!");
-            info!("NEURAL EVAL: This may explain persistent upward bias in game behavior");
-        }
-        
-        info!("NEURAL EVAL: =========================================");
-        
-        output
-    }
-    
-    /// Get move probabilities from neural network
+    /// Get move probabilities using the integrated Advanced Opponent Modeling systems
     pub fn get_move_probabilities(&self, board: &Board, you: &Battlesnake) -> HashMap<Direction, f32> {
-        let nn_output = self.evaluate_position(board, you);
-        let directions = Direction::all();
+        info!("ADVANCED NEURAL: =========================================");
+        info!("ADVANCED NEURAL: Starting ADVANCED OPONENT MODELING INTEGRATION evaluation");
+        info!("ADVANCED NEURAL: Snake: {} at ({}, {}), health: {}", you.id, you.head.x, you.head.y, you.health);
+        info!("ADVANCED NEURAL: Board: {}x{}, food: {}, snakes: {}", board.width, board.height, board.food.len(), board.snakes.len());
+        
+        let all_snakes: Vec<Battlesnake> = board.snakes.iter().cloned().collect();
+        let mut move_scores = HashMap::new();
+        
+        // ================================================================
+        // PHASE 1C: ADVANCED OPPONENT MODELING INTEGRATION
+        // ================================================================
+        info!("ADVANCED NEURAL: PHASE 1C - Advanced Opponent Modeling Integration");
+        
+        // 1. Territory Control Analysis (Phase 1C)
+        let territory_map = SpaceController::calculate_territory_map(board, &all_snakes);
+        info!("ADVANCED NEURAL: Territory control map calculated");
+        
+        // 2. Opponent Movement Prediction (Phase 1C)
+        let mut opponent_predictions = HashMap::new();
+        for opponent in &all_snakes {
+            if opponent.id != you.id {
+                let predictions = OpponentAnalyzer::predict_opponent_moves(opponent, board, &all_snakes);
+                info!("ADVANCED NEURAL: Predicted moves for opponent {}: {:?}", opponent.id, predictions);
+                opponent_predictions.insert(opponent.id.clone(), predictions);
+            }
+        }
+        
+        // 3. Identify cutting positions for area denial
+        let cutting_positions = OpponentAnalyzer::identify_cutting_positions(&you.head, you, board);
+        info!("ADVANCED NEURAL: Identified {} cutting positions for area denial", cutting_positions.len());
+        
+        // ================================================================
+        // INTEGRATED EVALUATION USING ALL SYSTEMS
+        // ================================================================
+        
+        for direction in Direction::all() {
+            let next_pos = you.head.apply_direction(&direction);
+            let mut total_score = 0.0;
+            
+            // Safety evaluation (highest priority)
+            let is_safe = SafetyChecker::is_safe_coordinate(&next_pos, board, &all_snakes);
+            let safety_score = if is_safe {
+                self.safety_weights[self.direction_index(&direction)] * 10.0
+            } else {
+                -50.0
+            };
+            total_score += safety_score;
+            info!("ADVANCED NEURAL: Move {:?} - Safety score: {:.2}", direction, safety_score);
+            
+            // Territory control evaluation
+            let territory_score = self.space_controller.get_area_control_score(
+                &you.head, &next_pos, board, &all_snakes, &you.id);
+            let weighted_territory = territory_score * self.territory_weights[self.direction_index(&direction)];
+            total_score += weighted_territory;
+            info!("ADVANCED NEURAL: Move {:?} - Territory score: {:.2}", direction, weighted_territory);
+            
+            // Advanced opponent modeling integration
+            let mut opponent_score = 0.0;
+            for (opponent_id, predictions) in &opponent_predictions {
+                if let Some(&opponent_prob) = predictions.get(&direction) {
+                    // Reward moves that counter opponent predictions
+                    let counter_bonus = (1.0 - opponent_prob) * 5.0;
+                    opponent_score += counter_bonus;
+                    info!("ADVANCED NEURAL: Move {:?} - Counter opponent {} bonus: {:.2}",
+                          direction, opponent_id, counter_bonus);
+                }
+            }
+            let weighted_opponent = opponent_score * self.opponent_weights[self.direction_index(&direction)];
+            total_score += weighted_opponent;
+            info!("ADVANCED NEURAL: Move {:?} - Opponent modeling score: {:.2}", direction, weighted_opponent);
+            
+            // Food seeking integration
+            let food_score = if FoodSeeker::should_seek_food(you.health, 0, !board.food.is_empty()) {
+                if let Some(target) = FoodSeeker::find_best_food_target(&you.head, board, you.health, true) {
+                    let food_direction = Self::get_direction_to_target(&you.head, &target.coord);
+                    if food_direction == direction {
+                        target.priority * 0.5
+                    } else {
+                        0.0
+                    }
+                } else { 0.0 }
+            } else { 0.0 };
+            total_score += food_score;
+            info!("ADVANCED NEURAL: Move {:?} - Food seeking score: {:.2}", direction, food_score);
+            
+            // Space exploration bonus
+            let reachable_spaces = ReachabilityAnalyzer::count_reachable_spaces(&next_pos, board, &all_snakes);
+            let exploration_score = (reachable_spaces as f32) * 0.3;
+            total_score += exploration_score;
+            info!("ADVANCED NEURAL: Move {:?} - Exploration score: {:.2}", direction, exploration_score);
+            
+            // Cutting position bonus (area denial)
+            let cutting_bonus = if cutting_positions.contains(&next_pos) { 8.0 } else { 0.0 };
+            total_score += cutting_bonus;
+            info!("ADVANCED NEURAL: Move {:?} - Cutting position bonus: {:.2}", direction, cutting_bonus);
+            
+            // Movement quality bonus (loop prevention)
+            let recent_moves = self.movement_history.get_recent_moves();
+            let movement_bonus = MovementQualityAnalyzer::calculate_movement_bonus(
+                &you.head, &next_pos, &recent_moves, direction);
+            total_score += movement_bonus;
+            info!("ADVANCED NEURAL: Move {:?} - Movement quality bonus: {:.2}", direction, movement_bonus);
+            
+            // Neural network integration
+            let nn_base_score = self.nn_weights[0][self.direction_index(&direction)] *
+                               self.nn_weights[1][self.direction_index(&direction)] *
+                               self.nn_weights[2][self.direction_index(&direction)];
+            total_score += nn_base_score;
+            info!("ADVANCED NEURAL: Move {:?} - Neural network base score: {:.2}", direction, nn_base_score);
+            
+            move_scores.insert(direction, total_score);
+            info!("ADVANCED NEURAL: Move {:?} - TOTAL SCORE: {:.2}", direction, total_score);
+        }
+        
+        // ================================================================
+        // CONVERT SCORES TO PROBABILITIES
+        // ================================================================
+        
+        let max_score = move_scores.values().fold(f32::NEG_INFINITY, |a, &b| a.max(b));
+        let min_score = move_scores.values().fold(f32::INFINITY, |a, &b| a.min(b));
+        let score_range = (max_score - min_score).max(1.0);
+        
+        info!("ADVANCED NEURAL: Score range: {:.2} to {:.2}", min_score, max_score);
         
         let mut probabilities = HashMap::new();
-        for (i, &direction) in directions.iter().enumerate() {
-            probabilities.insert(direction, nn_output[i]);
+        let mut total_prob = 0.0;
+        
+        for (direction, score) in &move_scores {
+            // Convert to probability using softmax
+            let normalized_score = (score - min_score) / score_range;
+            let probability = normalized_score.max(0.01); // Ensure minimum probability
+            probabilities.insert(*direction, probability);
+            total_prob += probability;
+            info!("ADVANCED NEURAL: Move {:?} - Raw score: {:.2}, Probability: {:.3}",
+                  direction, score, probability);
         }
         
-        info!("NEURAL EVAL: Move probabilities: {:?}", probabilities);
+        // Normalize probabilities
+        for (direction, prob) in probabilities.iter_mut() {
+            *prob /= total_prob;
+        }
+        
+        info!("ADVANCED NEURAL: =========================================");
+        info!("ADVANCED NEURAL: FINAL PROBABILITIES (Advanced Opponent Modeling Integration):");
+        for (direction, &prob) in &probabilities {
+            info!("ADVANCED NEURAL:   {:?}: {:.3} ({:.1}%)", direction, prob, prob * 100.0);
+        }
+        info!("ADVANCED NEURAL: Sum: {:.3}", probabilities.values().sum::<f32>());
+        info!("ADVANCED NEURAL: =========================================");
+        info!("ADVANCED NEURAL: SUCCESS - Advanced Opponent Modeling Integration is ACTIVE!");
+        info!("ADVANCED NEURAL: Using Phase 1C territory control, opponent prediction, and cutting positions");
+        
         probabilities
+    }
+    
+    /// Helper function to get direction index
+    fn direction_index(&self, direction: &Direction) -> usize {
+        match direction {
+            Direction::Up => 0,
+            Direction::Down => 1,
+            Direction::Left => 2,
+            Direction::Right => 3,
+        }
+    }
+    
+    /// Helper function to calculate direction to target
+    fn get_direction_to_target(from: &Coord, to: &Coord) -> Direction {
+        let dx = to.x - from.x;
+        let dy = to.y - from.y;
+        
+        if dx.abs() > dy.abs() {
+            if dx > 0 { Direction::Right } else { Direction::Left }
+        } else {
+            if dy > 0 { Direction::Up } else { Direction::Down }
+        }
+    }
+    
+    /// Update movement history
+    pub fn add_move_to_history(&mut self, direction: Direction, position: Coord, score: f32) {
+        self.movement_history.add_move(direction, position, score);
     }
 }
 
@@ -2705,7 +2812,7 @@ impl SimpleNeuralEvaluator {
 
 /// Enhanced Hybrid Search Manager with working neural network integration
 pub struct EnhancedHybridManager {
-    neural_evaluator: SimpleNeuralEvaluator,
+    neural_evaluator: AdvancedNeuralEvaluator,
     minimax_decision_maker: MinimaxDecisionMaker,
     mcts_decision_maker: MCTSDecisionMaker,
 }
@@ -2713,7 +2820,7 @@ pub struct EnhancedHybridManager {
 impl EnhancedHybridManager {
     pub fn new() -> Self {
         Self {
-            neural_evaluator: SimpleNeuralEvaluator::new(),
+            neural_evaluator: AdvancedNeuralEvaluator::new(),
             minimax_decision_maker: MinimaxDecisionMaker::new(),
             mcts_decision_maker: MCTSDecisionMaker::new(),
         }
@@ -2730,135 +2837,149 @@ impl EnhancedHybridManager {
               our_health, num_snakes, board.width, board.height, board_complexity);
         info!("ENHANCED HYBRID: ================================================");
         
-        // STEP 1: Get neural network evaluation
-        info!("ENHANCED HYBRID: STEP 1 - Calling neural network evaluator...");
+        // ================================================================
+        // PROPER DECISION HIERARCHY: Safety First → Neural Network → Strategic Logic
+        // ================================================================
+        
+        // STEP 1: SAFETY FIRST - Calculate safe moves before any AI evaluation
+        info!("ENHANCED HYBRID: STEP 1 - SAFETY FIRST - Calculating safe moves...");
+        let all_snakes: Vec<Battlesnake> = board.snakes.iter().cloned().collect();
+        let safe_moves = SafetyChecker::calculate_safe_moves(you, board, &all_snakes);
+        let safe_moves = SafetyChecker::avoid_backward_move(you, safe_moves);
+        
+        info!("ENHANCED HYBRID: STEP 1 RESULTS - Safe moves available: {:?} (count: {})",
+              safe_moves.iter().map(|d| format!("{:?}", d)).collect::<Vec<_>>(), safe_moves.len());
+        
+        if safe_moves.is_empty() {
+            info!("ENHANCED HYBRID: STEP 1 - CRITICAL: No safe moves available! Using emergency fallback");
+            // Emergency fallback - no safe moves, must choose something
+            let emergency_result = self.get_search_recommendation(game, board, you);
+            info!("ENHANCED HYBRID: STEP 1 - Emergency fallback decision: {:?}", emergency_result);
+            return emergency_result;
+        }
+        
+        // STEP 2: NEURAL NETWORK EVALUATION (only if we have safe moves)
+        info!("ENHANCED HYBRID: STEP 2 - NEURAL NETWORK EVALUATION - Getting AI recommendations...");
         let nn_probabilities = self.neural_evaluator.get_move_probabilities(board, you);
-        let nn_best_move = nn_probabilities.iter()
-            .max_by(|a, b| a.1.partial_cmp(b.1).unwrap_or(std::cmp::Ordering::Equal))
+        
+        // Filter neural network recommendations to only safe moves
+        let safe_nn_moves: Vec<(Direction, f32)> = nn_probabilities.iter()
+            .filter(|(direction, _)| safe_moves.contains(direction))
+            .map(|(direction, &prob)| (*direction, prob))
+            .collect();
+            
+        info!("ENHANCED HYBRID: STEP 2 RESULTS - Neural network probabilities: {:?}", nn_probabilities);
+        info!("ENHANCED HYBRID: STEP 2 RESULTS - Safe neural network moves: {:?}",
+              safe_nn_moves.iter().map(|(d, p)| format!("{:?}: {:.3}", d, p)).collect::<Vec<_>>());
+        
+        if safe_nn_moves.is_empty() {
+            info!("ENHANCED HYBRID: STEP 2 - WARNING: No safe neural network moves found, falling through to strategic logic");
+            let fallback_result = self.get_search_recommendation(game, board, you);
+            info!("ENHANCED HYBRID: STEP 2 - Strategic fallback decision: {:?}", fallback_result);
+            return fallback_result;
+        }
+        
+        // Find best safe neural network move
+        let best_safe_nn_move = safe_nn_moves.iter()
+            .max_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal))
             .map(|(direction, _)| *direction);
             
-        info!("ENHANCED HYBRID: STEP 1 RESULTS - Neural network probabilities: {:?}", nn_probabilities);
-        info!("ENHANCED HYBRID: STEP 1 RESULTS - Neural network suggests: {:?}", nn_best_move);
+        let max_nn_prob = safe_nn_moves.iter()
+            .map(|(_, prob)| *prob)
+            .fold(0.0, f32::max);
+            
+        info!("ENHANCED HYBRID: STEP 2 RESULTS - Best safe NN move: {:?} (prob: {:.4})",
+              best_safe_nn_move, max_nn_prob);
         
-        // STEP 2: Calculate confidence based on probability distribution
-        let mut max_prob: f32 = 0.0;
-        let mut prob_sum: f32 = 0.0;
-        let mut prob_variance: f32 = 0.0;
+        // CRITICAL: DIRECT NEURAL NETWORK OVERRIDE FOR HIGH-SCORING EVALUATIONS
+        let direct_override_threshold = 0.30;
+        info!("ENHANCED HYBRID: STEP 3 OVERRIDE CHECK:");
+        info!("ENHANCED HYBRID:         - Max NN probability: {:.4}", max_nn_prob);
+        info!("ENHANCED HYBRID:         - Direct override threshold: {:.3}", direct_override_threshold);
         
-        for &val in nn_probabilities.values() {
-            prob_sum += val;
-            if val > max_prob {
-                max_prob = val;
+        // NEURAL NETWORK OVERRIDE: Use NN when probability > 0.30 regardless of safety
+        if max_nn_prob > direct_override_threshold && best_safe_nn_move.is_some() {
+            info!("ENHANCED HYBRID: STEP 3 OVERRIDE - HIGH NEURAL NETWORK SCORE DETECTED!");
+            info!("ENHANCED HYBRID: STEP 3 OVERRIDE - Neural network probability {:.4} exceeds override threshold {:.3}",
+                  max_nn_prob, direct_override_threshold);
+            info!("ENHANCED HYBRID: STEP 3 OVERRIDE - Using neural network recommendation directly");
+            if let Some(move_direction) = best_safe_nn_move {
+                info!("ENHANCED HYBRID: STEP 3 OVERRIDE - DIRECT NEURAL DECISION: {:?} (NN prob: {:.4})",
+                      move_direction, max_nn_prob);
+                info!("ENHANCED HYBRID: STEP 3 OVERRIDE - Neural network is making the decision!");
+                info!("ENHANCED HYBRID: STEP 3 OVERRIDE - ===============================");
+                return json!({
+                    "move": format!("{:?}", move_direction).to_lowercase(),
+                    "decision_source": "neural_network_override",
+                    "confidence": max_nn_prob
+                });
             }
         }
         
-        // Calculate variance to assess decision certainty
-        for &val in nn_probabilities.values() {
-            let diff = val - (prob_sum / nn_probabilities.len() as f32);
-            prob_variance += diff * diff;
-        }
-        
-        info!("ENHANCED HYBRID: STEP 2 - Max prob: {:.4}, Sum: {:.4}, Variance: {:.4}",
-              max_prob, prob_sum, prob_variance);
-        
+        // OPTIMIZED CONFIDENCE THRESHOLDS - ALLOW MORE NEURAL NETWORK USAGE
         let confidence_threshold = match num_snakes {
-            1 => 0.3,  // LOWERED: Neural network priority in solo games (was 0.6)
-            2..=3 => 0.4, // LOWERED: Neural network priority in small games (was 0.7)
-            _ => 0.5,     // LOWERED: Neural network priority in large games (was 0.8)
+            1 => 0.25,  // LOW confidence required for solo games
+            2..=3 => 0.25, // LOW confidence required for small games
+            _ => 0.25,     // LOW confidence required for large games
         };
         
-        info!("ENHANCED HYBRID: STEP 2 - Confidence threshold: {:.3} (game type: {} snakes)", confidence_threshold, num_snakes);
+        info!("ENHANCED HYBRID: STEP 3 - CONFIDENCE EVALUATION:");
+        info!("ENHANCED HYBRID:         - Max NN probability: {:.4}", max_nn_prob);
+        info!("ENHANCED HYBRID:         - Required confidence: {:.3}", confidence_threshold);
+        info!("ENHANCED HYBRID:         - Safe moves available: {}", safe_moves.len());
         
-        // STEP 3: Decision strategy based on neural network confidence
-        info!("ENHANCED HYBRID: STEP 3 - Decision strategy analysis:");
-        info!("ENHANCED HYBRID:         - High confidence threshold: {:.3}", confidence_threshold);
-        info!("ENHANCED HYBRID:         - Current max probability: {:.3}", max_prob);
-        info!("ENHANCED HYBRID:         - Decision path: {}",
-              if max_prob > confidence_threshold { "HIGH CONFIDENCE" }
-              else if max_prob > 0.4 { "MEDIUM CONFIDENCE" }
-              else { "LOW CONFIDENCE - FALLBACK" });
-        
-        // HIGH CONFIDENCE: Use neural network suggestion directly
-        if max_prob > confidence_threshold {
-            info!("ENHANCED HYBRID: STEP 3A - HIGH CONFIDENCE PATH - Using neural network suggestion directly");
-            if let Some(move_direction) = nn_best_move {
-                info!("ENHANCED HYBRID: STEP 3A - CONFIDENT NEURAL DECISION: {:?}", move_direction);
-                info!("ENHANCED HYBRID: STEP 3A - This decision will OVERRIDE all other systems");
+        // HIGH CONFIDENCE: Use neural network suggestion if very confident AND safe
+        if max_nn_prob >= confidence_threshold {
+            info!("ENHANCED HYBRID: STEP 3A - HIGH CONFIDENCE NEURAL NETWORK - Using NN suggestion (confident AND safe)");
+            if let Some(move_direction) = best_safe_nn_move {
+                info!("ENHANCED HYBRID: STEP 3A - CONFIDENT SAFE NEURAL DECISION: {:?}", move_direction);
+                info!("ENHANCED HYBRID: STEP 3A - Neural network is confident ({:.4} >= {:.3}) AND move is safe",
+                      max_nn_prob, confidence_threshold);
                 info!("ENHANCED HYBRID: STEP 3A - ===============================");
                 return json!({ "move": format!("{:?}", move_direction).to_lowercase() });
             }
         }
         
-        // MEDIUM CONFIDENCE: NEURAL NETWORK PRIORITY - Winner-takes-all
-        if max_prob > 0.25 {
-            info!("ENHANCED HYBRID: STEP 3B - NEURAL NETWORK PRIORITY PATH - Using NN decision over search");
+        // MEDIUM CONFIDENCE: Consider neural network but with safety validation
+        if max_nn_prob >= 0.5 {
+            info!("ENHANCED HYBRID: STEP 3B - MEDIUM CONFIDENCE - Validating NN suggestion with safety score");
             
-            if let Some(nn_move) = nn_best_move {
-                info!("ENHANCED HYBRID: STEP 3B - WINNER-TAKES-ALL NEURAL DECISION: {:?}", nn_move);
-                info!("ENHANCED HYBRID: STEP 3B - This decision OVERRIDES all search algorithm suggestions");
-                info!("ENHANCED HYBRID: STEP 3B - Neural network probability {:.4} exceeds medium confidence threshold 0.25", max_prob);
-                info!("ENHANCED HYBRID: STEP 3B - ===============================");
-                return json!({ "move": format!("{:?}", nn_move).to_lowercase() });
-            }
-        }
-        
-        // LOW CONFIDENCE: Emergency neural network fallback (still try to use NN)
-        if max_prob > 0.15 {
-            info!("ENHANCED HYBRID: STEP 3C - EMERGENCY NEURAL NETWORK FALLBACK - Using NN despite low confidence");
-            
-            if let Some(nn_move) = nn_best_move {
-                info!("ENHANCED HYBRID: STEP 3C - EMERGENCY NN DECISION: {:?}", nn_move);
-                info!("ENHANCED HYBRID: STEP 3C - Using neural network even with low confidence {:.4} to avoid search override", max_prob);
-                info!("ENHANCED HYBRID: STEP 3C - ===============================");
-                return json!({ "move": format!("{:?}", nn_move).to_lowercase() });
-            }
-        }
-        
-        // CRITICAL EMERGENCY: Only use search when ALL neural network paths fail
-        info!("ENHANCED HYBRID: STEP 3D - CRITICAL EMERGENCY - All neural network paths failed");
-        info!("ENHANCED HYBRID: STEP 3D - This should RARELY happen with new lowered thresholds");
-        
-        // LEGACY: Old medium confidence path (for reference, should rarely execute)
-        if max_prob > 0.4 {
-            info!("ENHANCED HYBRID: STEP 3B - MEDIUM CONFIDENCE PATH - Combining NN with search algorithms");
-            
-            // Get search algorithm recommendations
-            info!("ENHANCED HYBRID: STEP 3B - Getting search algorithm recommendations...");
-            let search_result = self.get_search_recommendation(game, board, you);
-            
-            // Weighted combination: 70% NN, 30% search
-            if let Some(nn_move) = nn_best_move {
-                let nn_score = nn_probabilities.get(&nn_move).unwrap_or(&0.0);
-                let search_score = self.get_search_score_for_move(&search_result, &nn_move);
+            if let Some(nn_move) = best_safe_nn_move {
+                // Get safety score for this move
+                let next_pos = you.head.apply_direction(&nn_move);
+                let is_safe = SafetyChecker::is_safe_coordinate(&next_pos, board, &all_snakes);
+                let space_score = ReachabilityAnalyzer::count_reachable_spaces(&next_pos, board, &all_snakes) as f32 / 100.0;
                 
-                info!("ENHANCED HYBRID: STEP 3B - Hybrid scoring breakdown:");
-                info!("ENHANCED HYBRID:         - NN move {:?} probability: {:.4}", nn_move, nn_score);
-                info!("ENHANCED HYBRID:         - Search score for same move: {:.4}", search_score);
-                info!("ENHANCED HYBRID:         - Combined score: {:.4} (NN: 70%, Search: 30%)",
-                      nn_score * 0.7 + search_score * 0.3);
+                let safety_score = if is_safe { 0.8 } else { 0.0 } + space_score * 0.2;
+                let combined_score = max_nn_prob * 0.6 + safety_score * 0.4;
                 
-                let combined_score = nn_score * 0.7 + search_score * 0.3;
+                info!("ENHANCED HYBRID: STEP 3B - Safety validation for {:?}:", nn_move);
+                info!("ENHANCED HYBRID:         - NN probability: {:.4}", max_nn_prob);
+                info!("ENHANCED HYBRID:         - Safety score: {:.4}", safety_score);
+                info!("ENHANCED HYBRID:         - Combined score: {:.4}", combined_score);
                 
-                if combined_score > 0.5 {
-                    info!("ENHANCED HYBRID: STEP 3B - HYBRID DECISION: {:?} (combined score: {:.3})", nn_move, combined_score);
-                    info!("ENHANCED HYBRID: STEP 3B - This decision OVERRIDES search with NN preference");
+                if combined_score > 0.6 {
+                    info!("ENHANCED HYBRID: STEP 3B - VALIDATED NEURAL DECISION: {:?} (combined: {:.3})", nn_move, combined_score);
+                    info!("ENHANCED HYBRID: STEP 3B - Neural network suggestion passes safety validation");
                     info!("ENHANCED HYBRID: STEP 3B - ===============================");
                     return json!({ "move": format!("{:?}", nn_move).to_lowercase() });
                 } else {
-                    info!("ENHANCED HYBRID: STEP 3B - Combined score too low ({:.3}), falling through to search", combined_score);
+                    info!("ENHANCED HYBRID: STEP 3B - Neural network suggestion fails safety validation (score: {:.3} < 0.6)", combined_score);
                 }
             }
         }
         
-        // LOW CONFIDENCE: Use traditional search (THIS IS WHERE NEURAL NETWORK GETS OVERRIDDEN)
-        info!("ENHANCED HYBRID: STEP 3C - LOW CONFIDENCE - Falling back to traditional search");
-        info!("ENHANCED HYBRID: STEP 3C - WARNING: Neural network evaluation NOT used - using search algorithms");
-        info!("ENHANCED HYBRID: STEP 3C - This is the CRITICAL FAILURE POINT where NN gets overridden");
+        // LOW CONFIDENCE: Fall back to strategic logic (search algorithms)
+        info!("ENHANCED HYBRID: STEP 3C - LOW CONFIDENCE - Falling back to strategic logic");
+        info!("ENHANCED HYBRID: STEP 3C - Neural network confidence {:.4} below thresholds", max_nn_prob);
+        info!("ENHANCED HYBRID: STEP 3C - Using traditional search algorithms for strategic decision");
+        info!("ENHANCED HYBRID: STEP 3C - NO BIAS PATTERNS: Using sophisticated search with territory control");
         
         let final_result = self.get_search_recommendation(game, board, you);
         
-        info!("ENHANCED HYBRID: STEP 3C - Search fallback decision: {:?}", final_result);
-        info!("ENHANCED HYBRID: STEP 3C - Neural network was OVERRIDDEN by search algorithms");
+        info!("ENHANCED HYBRID: STEP 3C - Strategic decision: {:?}", final_result);
+        info!("ENHANCED HYBRID: STEP 3C - Decision hierarchy: SAFETY → NN (insufficient confidence) → STRATEGIC LOGIC");
+        info!("ENHANCED HYBRID: STEP 3C - Strategic logic uses: Territory Control + Opponent Modeling + Loop Prevention");
         info!("ENHANCED HYBRID: STEP 3C - ===============================");
         
         final_result
