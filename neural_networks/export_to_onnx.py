@@ -28,10 +28,10 @@ warnings.filterwarnings('ignore')
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 sys.path.append(str(PROJECT_ROOT))
 
-from neural_networks.neural_models import (
-    ModelConfig, PositionEvaluatorNetwork, MovePredictorNetwork, 
+from neural_models import (
+    ModelConfig, PositionEvaluatorNetwork, MovePredictorNetwork,
     GameOutcomePredictor, MultiTaskBattlesnakeNetwork,
-    create_position_evaluator, create_move_predictor, 
+    create_position_evaluator, create_move_predictor,
     create_game_outcome_predictor, create_multitask_network
 )
 

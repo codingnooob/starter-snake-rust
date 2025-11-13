@@ -16,7 +16,7 @@ from pathlib import Path
 from datetime import datetime
 import pickle
 
-from board_encoding import BoardState, BoardStateEncoder, TrainingSample
+from .board_encoding import BoardState, BoardStateEncoder, TrainingSample
 
 @dataclass
 class GameRecord:

@@ -1,0 +1,181 @@
+{
+  "execution_summary": {
+    "total_games": 4,
+    "solo_games": 4,
+    "multi_snake_games": 0,
+    "execution_time": 72.57425594329834,
+    "active_ports": [
+      8001,
+      8002,
+      8003,
+      8004
+    ],
+    "timestamp": "2025-11-13T13:29:33.177175"
+  },
+  "pattern_analysis": {
+    "total_unique_patterns": 0,
+    "most_common_patterns": [],
+    "cyclic_pattern_count": 0,
+    "average_entropy": 0,
+    "entropy_variance": 0,
+    "pattern_diversity": 0.0,
+    "repetitive_behavior_rate": 0.0
+  },
+  "behavioral_analysis": {
+    "dominant_behaviors": [],
+    "behavioral_consistency": 1.0,
+    "context_adaptability": 1.0,
+    "strategic_depth": 0.3,
+    "learning_indicators": [],
+    "decision_quality_trends": [],
+    "behavioral_clusters": [],
+    "anomaly_detection": []
+  },
+  "neural_analysis": {
+    "neural_percent": 0.0,
+    "mcts_percent": 0.0,
+    "minimax_percent": 0.0,
+    "territorial_percent": 0.0,
+    "emergency_percent": 0.0,
+    "avg_confidence": 0,
+    "confidence_variance": 0,
+    "high_confidence_rate": 0.0,
+    "low_confidence_rate": 0.0,
+    "neural_usage_consistency": 1.0
+  },
+  "statistical_analysis": {
+    "survival_times": {
+      "metric": "survival_times",
+      "descriptive_stats": {
+        "count": 4,
+        "mean": 0.0,
+        "median": 0.0,
+        "std_dev": 0.0,
+        "variance": 0.0,
+        "min": "0",
+        "max": "0",
+        "q1": 0.0,
+        "q3": 0.0,
+        "iqr": 0.0,
+        "skewness": NaN,
+        "kurtosis": NaN
+      },
+      "confidence_intervals": {
+        "mean": 0.0,
+        "std_dev": 0.0,
+        "std_error": 0.0,
+        "ci_lower": 0.0,
+        "ci_upper": 0.0,
+        "sample_size": 4
+      },
+      "normality_test": {
+        "shapiro_wilk": {
+          "statistic": 1.0,
+          "p_value": 1.0
+        },
+        "is_normal": "True"
+      }
+    },
+    "response_times": {
+      "metric": "response_times",
+      "descriptive_stats": {
+        "count": 4,
+        "mean": 0.0,
+        "median": 0.0,
+        "std_dev": 0.0,
+        "variance": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "q1": 0.0,
+        "q3": 0.0,
+        "iqr": 0.0,
+        "skewness": NaN,
+        "kurtosis": NaN
+      },
+      "confidence_intervals": {
+        "mean": 0.0,
+        "std_dev": 0.0,
+        "std_error": 0.0,
+        "ci_lower": 0.0,
+        "ci_upper": 0.0,
+        "sample_size": 4
+      },
+      "normality_test": {
+        "shapiro_wilk": {
+          "statistic": 1.0,
+          "p_value": 1.0
+        },
+        "is_normal": "True"
+      }
+    },
+    "entropy_scores": {
+      "metric": "entropy_scores",
+      "descriptive_stats": {
+        "count": 4,
+        "mean": 0.0,
+        "median": 0.0,
+        "std_dev": 0.0,
+        "variance": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "q1": 0.0,
+        "q3": 0.0,
+        "iqr": 0.0,
+        "skewness": NaN,
+        "kurtosis": NaN
+      },
+      "confidence_intervals": {
+        "mean": 0.0,
+        "std_dev": 0.0,
+        "std_error": 0.0,
+        "ci_lower": 0.0,
+        "ci_upper": 0.0,
+        "sample_size": 4
+      },
+      "normality_test": {
+        "shapiro_wilk": {
+          "statistic": 1.0,
+          "p_value": 1.0
+        },
+        "is_normal": "True"
+      }
+    },
+    "confidence_scores": {
+      "metric": "confidence_scores",
+      "descriptive_stats": {
+        "count": 4,
+        "mean": 0.5,
+        "median": 0.5,
+        "std_dev": 0.0,
+        "variance": 0.0,
+        "min": 0.5,
+        "max": 0.5,
+        "q1": 0.5,
+        "q3": 0.5,
+        "iqr": 0.0,
+        "skewness": NaN,
+        "kurtosis": NaN
+      },
+      "confidence_intervals": {
+        "mean": 0.5,
+        "std_dev": 0.0,
+        "std_error": 0.0,
+        "ci_lower": 0.5,
+        "ci_upper": 0.5,
+        "sample_size": 4
+      },
+      "normality_test": {
+        "shapiro_wilk": {
+          "statistic": 1.0,
+          "p_value": 1.0
+        },
+        "is_normal": "True"
+      }
+    },
+    "sample_adequacy": {
+      "actual_sample_size": 4,
+      "recommended_minimum": 63,
+      "adequate": false
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "model_config": {
+    "board_channels": 12,
+    "board_size": 11,
+    "snake_features_dim": 32,
+    "game_context_dim": 16,
+    "cnn_channels": [
+      64,
+      128,
+      256
+    ],
+    "kernel_size": 3,
+    "num_residual_blocks": 3,
+    "attention_embed_dim": 256,
+    "attention_num_heads": 8,
+    "attention_dropout": 0.1,
+    "fusion_hidden_dim": 512,
+    "fusion_dropout": 0.2,
+    "position_output_range": [
+      -50.0,
+      50.0
+    ],
+    "move_classes": 4,
+    "dropout_rate": 0.2,
+    "batch_norm_momentum": 0.1,
+    "weight_init_std": 0.02
+  },
+  "batch_size": 16,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "num_epochs": 5,
+  "early_stopping_patience": 3,
+  "position_loss_weight": 1.0,
+  "move_loss_weight": 1.0,
+  "outcome_loss_weight": 0.5,
+  "lr_scheduler_step_size": 25,
+  "lr_scheduler_gamma": 0.5,
+  "enable_data_augmentation": true,
+  "rotation_prob": 0.5,
+  "mirror_prob": 0.3,
+  "validation_split": 0.2,
+  "validation_frequency": 2,
+  "save_frequency": 2,
+  "keep_best_model": true,
+  "device": "cpu",
+  "num_workers": 4,
+  "pin_memory": true,
+  "log_frequency": 5,
+  "plot_training_curves": false
+}

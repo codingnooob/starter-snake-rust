@@ -1,0 +1,1359 @@
+warning: unused manifest key: lib.description
+warning: unused manifest key: lib.homepage
+warning: unused manifest key: lib.keywords
+warning: unused manifest key: lib.readme
+warning: unused manifest key: lib.repository
+warning: unused import: `ndarray::Array3`
+ --> src/advanced_spatial_analysis.rs:4:5
+  |
+4 | use ndarray::Array3;
+  |     ^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `error`
+  --> src/neural_network.rs:12:23
+   |
+12 | use log::{info, warn, error};
+   |                       ^^^^^
+
+warning: unused import: `Coord`
+  --> src/neural_network.rs:15:33
+   |
+15 | use crate::{Board, Battlesnake, Coord};
+   |                                 ^^^^^
+
+warning: unused import: `warn`
+ --> src/unified_confidence.rs:7:17
+  |
+7 | use log::{info, warn, debug};
+  |                 ^^^^
+
+warning: unused imports: `debug` and `error`
+ --> src/neural_confidence_integration.rs:9:23
+  |
+9 | use log::{info, warn, debug, error};
+  |                       ^^^^^  ^^^^^
+
+warning: unused import: `EnhancedNeuralEvaluator`
+ --> src/confidence_validation.rs:5:83
+  |
+5 | use crate::neural_confidence_integration::{NeuralDecisionRecord, DecisionOutcome, EnhancedNeuralEvaluator};
+  |                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Battlesnake`, `Board`, and `Coord`
+ --> src/confidence_validation.rs:7:13
+  |
+7 | use crate::{Board, Battlesnake, Coord};
+  |             ^^^^^  ^^^^^^^^^^^  ^^^^^
+
+warning: unused import: `UnifiedConfidenceCalculator`
+ --> src/adaptive_neural_system.rs:4:51
+  |
+4 | use crate::unified_confidence::{ConfidenceConfig, UnifiedConfidenceCalculator};
+  |                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NeuralDecisionResult`
+ --> src/adaptive_neural_system.rs:5:91
+  |
+5 | use crate::neural_confidence_integration::{EnhancedNeuralEvaluator, NeuralDecisionRecord, NeuralDecisionResult, NeuralNetworkOutputs, Dec...
+  |                                                                                           ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `ValidationRecord`
+ --> src/adaptive_neural_system.rs:6:57
+  |
+6 | use crate::confidence_validation::{ConfidenceValidator, ValidationRecord, GameValidationContext};
+  |                                                         ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `NeuralNetworkInput` and `NeuralNetworkOutput`
+ --> src/adaptive_neural_system.rs:7:88
+  |
+7 | use crate::neural_network::{ONNXInferenceEngine, BoardStateEncoder, NeuralNetworkType, NeuralNetworkInput, NeuralNetworkOutput};
+  |                                                                                        ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Coord`
+ --> src/adaptive_neural_system.rs:8:33
+  |
+8 | use crate::{Board, Battlesnake, Coord};
+  |                                 ^^^^^
+
+warning: unused import: `error`
+  --> src/adaptive_neural_system.rs:13:30
+   |
+13 | use log::{info, warn, debug, error};
+   |                              ^^^^^
+
+warning: unused import: `ndarray`
+  --> src/adaptive_neural_system.rs:14:5
+   |
+14 | use ndarray;
+   |     ^^^^^^^
+
+warning: variant `Insufficient_Data` should have an upper camel case name
+  --> src/adaptive_neural_system.rs:55:5
+   |
+55 |     Insufficient_Data,
+   |     ^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `InsufficientData`
+   |
+   = note: `#[warn(non_camel_case_types)]` (part of `#[warn(nonstandard_style)]`) on by default
+
+warning: unused import: `std::collections::HashMap`
+  --> src/enhanced_decision_system.rs:11:5
+   |
+11 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `start_time`
+   --> src/advanced_spatial_analysis.rs:218:13
+    |
+218 |         let start_time = Instant::now();
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_time`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `our_snake`
+   --> src/advanced_spatial_analysis.rs:281:57
+    |
+281 |     fn analyze_future_dangers(&mut self, board: &Board, our_snake: &Battlesnake, _turn: u32) {
+    |                                                         ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_our_snake`
+
+warning: unused variable: `score`
+   --> src/logic.rs:562:71
+    |
+562 |     pub fn add_move(&mut self, direction: Direction, position: Coord, score: f32) {
+    |                                                                       ^^^^^ help: if this is intentional, prefix it with an underscore: `_score`
+
+warning: unused variable: `current_position`
+   --> src/logic.rs:579:42
+    |
+579 |     fn update_declining_trend(&mut self, current_position: Coord) {
+    |                                          ^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_current_position`
+
+warning: unused variable: `recent_positions`
+   --> src/logic.rs:676:9
+    |
+676 |         recent_positions: &[Coord],
+    |         ^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_recent_positions`
+
+warning: variable does not need to be mutable
+    --> src/logic.rs:2068:13
+     |
+2068 |         let mut current = self.node_at_path_mut(root, path);
+     |             ----^^^^^^^
+     |             |
+     |             help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `max_iterations`
+    --> src/logic.rs:2289:52
+     |
+2289 |     pub fn calculate_efficiency_metrics(&mut self, max_iterations: u32) {
+     |                                                    ^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_max_iterations`
+
+warning: unused variable: `alpha`
+    --> src/logic.rs:2907:13
+     |
+2907 |         let alpha = f32::NEG_INFINITY;
+     |             ^^^^^ help: if this is intentional, prefix it with an underscore: `_alpha`
+
+warning: unused variable: `beta`
+    --> src/logic.rs:2908:13
+     |
+2908 |         let beta = f32::INFINITY;
+     |             ^^^^ help: if this is intentional, prefix it with an underscore: `_beta`
+
+warning: unused variable: `depth`
+    --> src/logic.rs:2904:23
+     |
+2904 |                       depth: u8, time_budget: u128, search_start: Instant) -> (Direction, f32) {
+     |                       ^^^^^ help: if this is intentional, prefix it with an underscore: `_depth`
+
+warning: unused variable: `time_budget`
+    --> src/logic.rs:2904:34
+     |
+2904 |                       depth: u8, time_budget: u128, search_start: Instant) -> (Direction, f32) {
+     |                                  ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_time_budget`
+
+warning: unused variable: `direction`
+    --> src/logic.rs:4522:14
+     |
+4522 |         for (direction, prob) in probabilities.iter_mut() {
+     |              ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_direction`
+
+warning: unused variable: `start_time`
+    --> src/logic.rs:4588:13
+     |
+4588 |         let start_time = std::time::Instant::now();
+     |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_time`
+
+warning: value assigned to `score` is never read
+   --> src/neural_network.rs:188:25
+    |
+188 |                 let mut score = 0.0;
+    |                         ^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> src/neural_network.rs:411:17
+    |
+411 |             let mut grid = Array3::zeros((12, self.max_board_size, self.max_board_size));
+    |                 ----^^^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: unused variable: `total_positions`
+   --> src/neural_network.rs:458:13
+    |
+458 |         let total_positions = (board.width * board.height as i32) as f32;
+    |             ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_total_positions`
+
+warning: unused variable: `total_positions`
+   --> src/neural_network.rs:509:13
+    |
+509 |         let total_positions = (board.width * board.height as i32) as f32;
+    |             ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_total_positions`
+
+warning: unused variable: `board`
+   --> src/neural_network.rs:744:45
+    |
+744 |     fn heuristic_position_evaluation(&self, board: &Board, our_snake: &Battlesnake) -> f32 {
+    |                                             ^^^^^ help: if this is intentional, prefix it with an underscore: `_board`
+
+warning: unused variable: `board`
+   --> src/neural_network.rs:758:41
+    |
+758 |     fn heuristic_win_probability(&self, board: &Board, our_snake: &Battlesnake) -> f32 {
+    |                                         ^^^^^ help: if this is intentional, prefix it with an underscore: `_board`
+
+warning: variable does not need to be mutable
+   --> src/neural_network.rs:793:9
+    |
+793 |     let mut evaluator = evaluator.lock().map_err(|e| anyhow!("Failed to lock evaluator: {}", e))?;
+    |         ----^^^^^^^^^
+    |         |
+    |         help: remove this `mut`
+
+warning: unused variable: `board`
+   --> src/neural_confidence_integration.rs:260:9
+    |
+260 |         board: &Board,
+    |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_board`
+
+warning: unused variable: `our_snake`
+   --> src/neural_confidence_integration.rs:261:9
+    |
+261 |         our_snake: &Battlesnake,
+    |         ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_our_snake`
+
+warning: unused variable: `level`
+   --> src/confidence_validation.rs:160:69
+    |
+160 |                 .filter(|record| matches!(&record.confidence_level, level))
+    |                                                                     ^^^^^ help: if this is intentional, prefix it with an underscore: `_level`
+
+warning: unused variable: `chosen_move`
+   --> src/confidence_validation.rs:348:9
+    |
+348 |         chosen_move: &str,
+    |         ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_chosen_move`
+
+warning: variable does not need to be mutable
+   --> src/adaptive_neural_system.rs:196:17
+    |
+196 |             let mut evaluator = self.neural_evaluator.lock().unwrap();
+    |                 ----^^^^^^^^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/adaptive_neural_system.rs:514:17
+    |
+514 |             let mut evaluator = self.neural_evaluator.lock().unwrap();
+    |                 ----^^^^^^^^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: unused variable: `chosen_move`
+   --> src/enhanced_decision_system.rs:253:5
+    |
+253 |     chosen_move: &str,
+    |     ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_chosen_move`
+
+warning: field `opponent_analyzer` is never read
+   --> src/logic.rs:753:5
+    |
+751 | pub struct TerritorialStrategist {
+    |            --------------------- field in this struct
+752 |     space_controller: SpaceController,
+753 |     opponent_analyzer: OpponentAnalyzer,
+    |     ^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `should_terminate_early`, `should_prune_tree`, `hash_state`, `get_cached_evaluation`, and `store_evaluation` are never used
+    --> src/logic.rs:2167:8
+     |
+1695 | impl MCTSSearcher {
+     | ----------------- methods in this implementation
+...
+2167 |     fn should_terminate_early(&self, root: &MCTSNode) -> bool {
+     |        ^^^^^^^^^^^^^^^^^^^^^^
+...
+2192 |     fn should_prune_tree(&self) -> bool {
+     |        ^^^^^^^^^^^^^^^^^
+...
+2197 |     fn hash_state(&self, state: &SimulatedGameState) -> u64 {
+     |        ^^^^^^^^^^
+...
+2219 |     fn get_cached_evaluation(&self, state: &SimulatedGameState) -> Option<f32> {
+     |        ^^^^^^^^^^^^^^^^^^^^^
+...
+2229 |     fn store_evaluation(&mut self, state: &SimulatedGameState, evaluation: f32) {
+     |        ^^^^^^^^^^^^^^^^
+
+warning: field `board_position_values` is never read
+    --> src/logic.rs:2448:5
+     |
+2446 | pub struct ZobristHasher {
+     |            ------------- field in this struct
+2447 |     // Pre-computed random values for each board position and game element
+2448 |     board_position_values: Vec<Vec<u64>>,  // [x][y] -> random value
+     |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: field `opponent_depth` is never read
+    --> src/logic.rs:2750:5
+     |
+2747 | pub struct TerritorialFallbackMaker {
+     |            ------------------------ field in this struct
+...
+2750 |     opponent_depth: u8,               // Opponent prediction depth: 4 levels
+     |     ^^^^^^^^^^^^^^
+
+warning: methods `minimax_with_opponent_modeling`, `evaluate_position`, and `hash_game_state` are never used
+    --> src/logic.rs:2950:8
+     |
+2757 | impl TerritorialFallbackMaker {
+     | ----------------------------- methods in this implementation
+...
+2950 |     fn minimax_with_opponent_modeling(&mut self, state: &SimulatedGameState, our_snake_id: &str,
+     |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+3257 |         fn evaluate_position(&self, state: &SimulatedGameState, our_snake_id: &str) -> f32 {
+     |            ^^^^^^^^^^^^^^^^^
+...
+3290 |     fn hash_game_state(&self, state: &SimulatedGameState) -> u64 {
+     |        ^^^^^^^^^^^^^^^
+
+warning: fields `opponent_analyzer` and `territorial_strategist` are never read
+    --> src/logic.rs:4349:5
+     |
+4346 | pub struct AdvancedNeuralEvaluator {
+     |            ----------------------- fields in this struct
+...
+4349 |     opponent_analyzer: OpponentAnalyzer,
+     |     ^^^^^^^^^^^^^^^^^
+4350 |     movement_history: MovementHistory,
+4351 |     territorial_strategist: TerritorialStrategist,
+     |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `get_search_score_for_move` is never used
+    --> src/logic.rs:4793:8
+     |
+4578 | impl EnhancedHybridManager {
+     | -------------------------- method in this implementation
+...
+4793 |     fn get_search_score_for_move(&self, search_result: &Value, target_move: &Direction) -> f32 {
+     |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: creating a shared reference to mutable static
+  --> src/enhanced_decision_system.rs:44:13
+   |
+44 |             ENHANCED_SYSTEM.is_some()
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^ shared reference to mutable static
+   |
+   = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+   = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+   = note: `#[warn(static_mut_refs)]` (part of `#[warn(rust_2024_compatibility)]`) on by default
+
+warning: creating a shared reference to mutable static
+  --> src/enhanced_decision_system.rs:61:39
+   |
+61 |             if let Some(system_arc) = &ENHANCED_SYSTEM {
+   |                                       ^^^^^^^^^^^^^^^^ shared reference to mutable static
+   |
+   = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+   = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+help: use `&raw const` instead to create a raw pointer
+   |
+61 |             if let Some(system_arc) = &raw const ENHANCED_SYSTEM {
+   |                                        +++++++++
+
+warning: creating a shared reference to mutable static
+   --> src/enhanced_decision_system.rs:109:39
+    |
+109 |             if let Some(system_arc) = &ENHANCED_SYSTEM {
+    |                                       ^^^^^^^^^^^^^^^^ shared reference to mutable static
+    |
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+    = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+help: use `&raw const` instead to create a raw pointer
+    |
+109 |             if let Some(system_arc) = &raw const ENHANCED_SYSTEM {
+    |                                        +++++++++
+
+warning: creating a shared reference to mutable static
+   --> src/enhanced_decision_system.rs:133:39
+    |
+133 |             if let Some(system_arc) = &ENHANCED_SYSTEM {
+    |                                       ^^^^^^^^^^^^^^^^ shared reference to mutable static
+    |
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+    = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+help: use `&raw const` instead to create a raw pointer
+    |
+133 |             if let Some(system_arc) = &raw const ENHANCED_SYSTEM {
+    |                                        +++++++++
+
+warning: creating a shared reference to mutable static
+   --> src/enhanced_decision_system.rs:149:39
+    |
+149 |             if let Some(system_arc) = &ENHANCED_SYSTEM {
+    |                                       ^^^^^^^^^^^^^^^^ shared reference to mutable static
+    |
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+    = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+help: use `&raw const` instead to create a raw pointer
+    |
+149 |             if let Some(system_arc) = &raw const ENHANCED_SYSTEM {
+    |                                        +++++++++
+
+warning: creating a shared reference to mutable static
+   --> src/enhanced_decision_system.rs:174:39
+    |
+174 |             if let Some(system_arc) = &ENHANCED_SYSTEM {
+    |                                       ^^^^^^^^^^^^^^^^ shared reference to mutable static
+    |
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+    = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+help: use `&raw const` instead to create a raw pointer
+    |
+174 |             if let Some(system_arc) = &raw const ENHANCED_SYSTEM {
+    |                                        +++++++++
+
+warning: creating a shared reference to mutable static
+   --> src/enhanced_decision_system.rs:192:39
+    |
+192 |             if let Some(system_arc) = &ENHANCED_SYSTEM {
+    |                                       ^^^^^^^^^^^^^^^^ shared reference to mutable static
+    |
+    = note: for more information, see <https://doc.rust-lang.org/edition-guide/rust-2024/static-mut-references.html>
+    = note: shared references to mutable statics are dangerous; it's undefined behavior if the static is mutated or if a mutable reference is created for it while the shared reference lives
+help: use `&raw const` instead to create a raw pointer
+    |
+192 |             if let Some(system_arc) = &raw const ENHANCED_SYSTEM {
+    |                                        +++++++++
+
+warning: `starter-snake-rust` (lib) generated 57 warnings (run `cargo fix --lib -p starter-snake-rust` to apply 20 suggestions)
+warning: unused import: `Deserialize`
+ --> src/main.rs:7:33
+  |
+7 | use rocket::serde::{json::Json, Deserialize};
+  |                                 ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `serde::Serialize`
+ --> src/main.rs:8:5
+  |
+8 | use serde::Serialize;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused import: `GameState`
+  --> src/test_json.rs:2:13
+   |
+ 2 | use crate::{GameState};
+   |             ^^^^^^^^^
+   |
+help: if this is a test module, consider adding a `#[cfg(test)]` to the containing module
+  --> src/main.rs:19:1
+   |
+19 | mod test_json;
+   | ^^^^^^^^^^^^^^
+
+warning: unused import: `Game`
+  --> src/main.rs:28:40
+   |
+28 | use types::{Board, Battlesnake, Coord, Game, GameState};
+   |                                        ^^^^
+
+warning: unused variable: `score`
+   --> src/logic.rs:562:71
+    |
+562 |     pub fn add_move(&mut self, direction: Direction, position: Coord, score: f32) {
+    |                                                                       ^^^^^ help: if this is intentional, prefix it with an underscore: `_score`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `distance_to_controller` is never read
+   --> src/logic.rs:285:9
+    |
+283 | pub struct TerritoryInfo {
+    |            ------------- field in this struct
+284 |     pub controller_id: Option<String>,
+285 |     pub distance_to_controller: i32,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `TerritoryInfo` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: associated function `new` is never used
+   --> src/logic.rs:297:12
+    |
+296 | impl TerritoryMap {
+    | ----------------- associated function in this implementation
+297 |     pub fn new(_width: i32, _height: i32) -> Self {
+    |            ^^^
+
+warning: field `opponent_analyzer` is never read
+   --> src/logic.rs:753:5
+    |
+751 | pub struct TerritorialStrategist {
+    |            --------------------- field in this struct
+752 |     space_controller: SpaceController,
+753 |     opponent_analyzer: OpponentAnalyzer,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: struct `HybridDecisionMaker` is never constructed
+    --> src/logic.rs:1010:12
+     |
+1010 | pub struct HybridDecisionMaker;
+     |            ^^^^^^^^^^^^^^^^^^^
+
+warning: associated function `make_move_decision` is never used
+    --> src/logic.rs:1013:12
+     |
+1012 | impl HybridDecisionMaker {
+     | ------------------------ associated function in this implementation
+1013 |     pub fn make_move_decision(_game: &Game, turn: &i32, board: &Board, you: &Battlesnake) -> Value {
+     |            ^^^^^^^^^^^^^^^^^^
+
+warning: associated function `undo_moves` is never used
+    --> src/logic.rs:1359:12
+     |
+1116 | impl GameSimulator {
+     | ------------------ associated function in this implementation
+...
+1359 |     pub fn undo_moves(state: &mut SimulatedGameState, move_app: &MoveApplication) {
+     |            ^^^^^^^^^^
+
+warning: associated function `new_child` is never used
+    --> src/logic.rs:1633:12
+     |
+1594 | impl MCTSNode {
+     | ------------- associated function in this implementation
+...
+1633 |     pub fn new_child(parent: &MCTSNode, move_direction: Direction) -> Self {
+     |            ^^^^^^^^^
+
+warning: fields `max_memory_nodes`, `prune_depth_threshold`, `early_termination_threshold`, and `transposition_table` are never read
+    --> src/logic.rs:1689:9
+     |
+1678 | pub struct MCTSSearcher {
+     |            ------------ fields in this struct
+...
+1689 |     pub max_memory_nodes: usize,      // Memory limit for tree size
+     |         ^^^^^^^^^^^^^^^^
+1690 |     pub prune_depth_threshold: u8,    // Depth beyond which to prune aggressively
+     |         ^^^^^^^^^^^^^^^^^^^^^
+1691 |     pub early_termination_threshold: f32, // Early exit confidence threshold
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1692 |     pub transposition_table: Option<HashMap<u64, f32>>, // Simple transposition table
+     |         ^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `with_performance_config`, `should_terminate_early`, `should_prune_tree`, `hash_state`, `get_cached_evaluation`, and `store_evaluation` are never used
+    --> src/logic.rs:1717:12
+     |
+1695 | impl MCTSSearcher {
+     | ----------------- associated items in this implementation
+...
+1717 |     pub fn with_performance_config(
+     |            ^^^^^^^^^^^^^^^^^^^^^^^
+...
+2167 |     fn should_terminate_early(&self, root: &MCTSNode) -> bool {
+     |        ^^^^^^^^^^^^^^^^^^^^^^
+...
+2192 |     fn should_prune_tree(&self) -> bool {
+     |        ^^^^^^^^^^^^^^^^^
+...
+2197 |     fn hash_state(&self, state: &SimulatedGameState) -> u64 {
+     |        ^^^^^^^^^^
+...
+2219 |     fn get_cached_evaluation(&self, state: &SimulatedGameState) -> Option<f32> {
+     |        ^^^^^^^^^^^^^^^^^^^^^
+...
+2229 |     fn store_evaluation(&mut self, state: &SimulatedGameState, evaluation: f32) {
+     |        ^^^^^^^^^^^^^^^^
+
+warning: fields `average_depth_reached`, `terminal_nodes_visited`, and `unique_positions_explored` are never read
+    --> src/logic.rs:2261:9
+     |
+2256 | pub struct MCTSSearchStats {
+     |            --------------- fields in this struct
+...
+2261 |     pub average_depth_reached: f32,
+     |         ^^^^^^^^^^^^^^^^^^^^^
+2262 |     pub terminal_nodes_visited: u64,
+     |         ^^^^^^^^^^^^^^^^^^^^^^
+...
+2267 |     pub unique_positions_explored: u64,
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `MCTSSearchStats` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: method `generate_performance_report` is never used
+    --> src/logic.rs:2321:12
+     |
+2288 | impl MCTSSearchStats {
+     | -------------------- method in this implementation
+...
+2321 |     pub fn generate_performance_report(&self) -> String {
+     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function `with_config` is never used
+    --> src/logic.rs:2364:12
+     |
+2354 | impl MCTSDecisionMaker {
+     | ---------------------- associated function in this implementation
+...
+2364 |     pub fn with_config(max_iterations: u32, time_limit_ms: u128, exploration_constant: f32, max_depth: u8) -> Self {
+     |            ^^^^^^^^^^^
+
+warning: struct `HybridSearchManager` is never constructed
+    --> src/logic.rs:2401:12
+     |
+2401 | pub struct HybridSearchManager {
+     |            ^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `new` and `make_decision` are never used
+    --> src/logic.rs:2407:12
+     |
+2406 | impl HybridSearchManager {
+     | ------------------------ associated items in this implementation
+2407 |     pub fn new() -> Self {
+     |            ^^^
+...
+2414 |     pub fn make_decision(&mut self, _game: &Game, board: &Board, you: &Battlesnake) -> Value {
+     |            ^^^^^^^^^^^^^
+
+warning: fields `computation_time_ms` and `access_time` are never read
+    --> src/logic.rs:2582:9
+     |
+2580 | pub struct TranspositionEntry {
+     |            ------------------ fields in this struct
+2581 |     pub territory_map: TerritoryMap,
+2582 |     pub computation_time_ms: u128,
+     |         ^^^^^^^^^^^^^^^^^^^
+2583 |     pub access_time: Instant,
+     |         ^^^^^^^^^^^
+     |
+     = note: `TranspositionEntry` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: associated items `with_capacity` and `get_hit_rate` are never used
+    --> src/logic.rs:2614:12
+     |
+2598 | impl TranspositionTable {
+     | ----------------------- associated items in this implementation
+...
+2614 |     pub fn with_capacity(capacity: usize) -> Self {
+     |            ^^^^^^^^^^^^^
+...
+2626 |     pub fn get_hit_rate(&self) -> f32 {
+     |            ^^^^^^^^^^^^
+
+warning: fields `opponent_depth` and `transposition_table` are never read
+    --> src/logic.rs:2750:5
+     |
+2747 | pub struct TerritorialFallbackMaker {
+     |            ------------------------ fields in this struct
+...
+2750 |     opponent_depth: u8,               // Opponent prediction depth: 4 levels
+     |     ^^^^^^^^^^^^^^
+2751 |     zobrist_hasher: ZobristHasher,
+2752 |     transposition_table: std::cell::RefCell<TranspositionTable>,
+     |     ^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+    --> src/logic.rs:2774:12
+     |
+2757 | impl TerritorialFallbackMaker {
+     | ----------------------------- methods in this implementation
+...
+2774 |     pub fn calculate_cached_territory_map(&self, board: &Board, snakes: &[Battlesnake]) -> TerritoryMap {
+     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+2950 |     fn minimax_with_opponent_modeling(&mut self, state: &SimulatedGameState, our_snake_id: &str,
+     |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+3257 |         fn evaluate_position(&self, state: &SimulatedGameState, our_snake_id: &str) -> f32 {
+     |            ^^^^^^^^^^^^^^^^^
+...
+3290 |     fn hash_game_state(&self, state: &SimulatedGameState) -> u64 {
+     |        ^^^^^^^^^^^^^^^
+...
+3300 |     pub fn generate_moves_for_state(&self, state: &SimulatedGameState, snake_id: &str) -> Vec<Direction> {
+     |            ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+3317 |     pub fn apply_move_to_state(&self, state: &SimulatedGameState, snake_id: &str, direction: Direction) -> Result<SimulatedGameState, &'s...
+     |            ^^^^^^^^^^^^^^^^^^^
+...
+3349 |     fn convert_simulated_to_board(&self, state: &SimulatedGameState) -> Board {
+     |        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+3364 |     fn convert_simulated_to_battlesnake(&self, snake: &SimulatedSnake) -> Battlesnake {
+     |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `add_move_to_history` is never used
+    --> src/logic.rs:4562:12
+     |
+4360 | impl AdvancedNeuralEvaluator {
+     | ---------------------------- method in this implementation
+...
+4562 |     pub fn add_move_to_history(&mut self, direction: Direction, position: Coord, score: f32) {
+     |            ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `NeuralNetworkInput` is never constructed
+  --> src/neural_network.rs:21:12
+   |
+21 | pub struct NeuralNetworkInput {
+   |            ^^^^^^^^^^^^^^^^^^
+
+warning: struct `NeuralNetworkOutput` is never constructed
+  --> src/neural_network.rs:27:12
+   |
+27 | pub struct NeuralNetworkOutput {
+   |            ^^^^^^^^^^^^^^^^^^^
+
+warning: enum `NeuralNetworkType` is never used
+  --> src/neural_network.rs:34:10
+   |
+34 | pub enum NeuralNetworkType {
+   |          ^^^^^^^^^^^^^^^^^
+
+warning: struct `ONNXInferenceEngine` is never constructed
+  --> src/neural_network.rs:51:12
+   |
+51 | pub struct ONNXInferenceEngine {
+   |            ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `ModelMetadata` is never constructed
+  --> src/neural_network.rs:57:12
+   |
+57 | pub struct ModelMetadata {
+   |            ^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> src/neural_network.rs:68:12
+    |
+ 66 | impl ONNXInferenceEngine {
+    | ------------------------ associated items in this implementation
+ 67 |     /// Create new ONNX inference engine
+ 68 |     pub fn new() -> Self {
+    |            ^^^
+...
+ 76 |     pub fn load_model(
+    |            ^^^^^^^^^^
+...
+115 |     fn load_metadata(&self, metadata_path: &str) -> Result<ModelMetadata> {
+    |        ^^^^^^^^^^^^^
+...
+137 |     fn create_default_metadata(&self, model_type: &NeuralNetworkType) -> Result<ModelMetadata> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^
+...
+155 |     pub fn run_inference(
+    |            ^^^^^^^^^^^^^
+...
+176 |     fn run_mock_inference(
+    |        ^^^^^^^^^^^^^^^^^^
+...
+248 |     pub fn is_model_loaded(&self, model_type: &NeuralNetworkType) -> bool {
+    |            ^^^^^^^^^^^^^^^
+...
+254 |     pub fn get_model_metadata(&self, model_type: &NeuralNetworkType) -> Option<ModelMetadata> {
+    |            ^^^^^^^^^^^^^^^^^^
+
+warning: enum `BoardEncodingMode` is never used
+   --> src/neural_network.rs:262:10
+    |
+262 | pub enum BoardEncodingMode {
+    |          ^^^^^^^^^^^^^^^^^
+
+warning: struct `BoardStateEncoder` is never constructed
+   --> src/neural_network.rs:269:12
+    |
+269 | pub struct BoardStateEncoder {
+    |            ^^^^^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> src/neural_network.rs:278:12
+    |
+276 | impl BoardStateEncoder {
+    | ---------------------- associated items in this implementation
+277 |     /// Create new board state encoder with basic 7-channel mode
+278 |     pub fn new(max_board_size: usize) -> Self {
+    |            ^^^
+...
+287 |     pub fn new_with_mode(max_board_size: usize, mode: BoardEncodingMode) -> Self {
+    |            ^^^^^^^^^^^^^
+...
+303 |     pub fn get_num_channels(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^
+...
+311 |     pub fn set_encoding_mode(&mut self, mode: BoardEncodingMode) {
+    |            ^^^^^^^^^^^^^^^^^
+...
+321 |     pub fn encode_board_state(&mut self, board: &Board, our_snake: &Battlesnake) -> NeuralNetworkInput {
+    |            ^^^^^^^^^^^^^^^^^^
+...
+333 |     fn encode_basic_7_channel(&self, board: &Board, our_snake: &Battlesnake) -> NeuralNetworkInput {
+    |        ^^^^^^^^^^^^^^^^^^^^^^
+...
+402 |     fn encode_advanced_12_channel(&mut self, board: &Board, our_snake: &Battlesnake) -> NeuralNetworkInput {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+436 |     fn encode_advanced_12_channel_fallback(&mut self, board: &Board, our_snake: &Battlesnake) -> NeuralNetworkInput {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+485 |     fn create_feature_vector(&self, board: &Board, our_snake: &Battlesnake) -> Array2<f32> {
+    |        ^^^^^^^^^^^^^^^^^^^^^
+...
+497 |     fn create_enhanced_feature_vector(&self, board: &Board, our_snake: &Battlesnake /*, advanced_encoder: &AdvancedBoardStateEncoder */) ...
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+535 |     fn pad_to_max_size(&self, grid: Array3<f32>, height: usize, width: usize) -> Array3<f32> {
+    |        ^^^^^^^^^^^^^^^
+
+warning: struct `NeuralNetworkEvaluator` is never constructed
+   --> src/neural_network.rs:550:12
+    |
+550 | pub struct NeuralNetworkEvaluator {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> src/neural_network.rs:560:12
+    |
+558 | impl NeuralNetworkEvaluator {
+    | --------------------------- associated items in this implementation
+559 |     /// Create new neural network evaluator with basic 7-channel mode
+560 |     pub fn new() -> Self {
+    |            ^^^
+...
+571 |     pub fn new_with_encoding_mode(encoding_mode: BoardEncodingMode) -> Self {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+582 |     pub fn enable_advanced_mode(&mut self) {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+589 |     pub fn enable_basic_mode(&mut self) {
+    |            ^^^^^^^^^^^^^^^^^
+...
+596 |     pub fn get_encoding_mode(&self) -> BoardEncodingMode {
+    |            ^^^^^^^^^^^^^^^^^
+...
+601 |     pub fn get_num_channels(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^
+...
+606 |     pub fn load_models(&self, model_dir: &str) -> Result<()> {
+    |            ^^^^^^^^^^^
+...
+672 |     pub fn evaluate_position(&mut self, board: &Board, our_snake: &Battlesnake) -> Result<f32> {
+    |            ^^^^^^^^^^^^^^^^^
+...
+700 |     fn evaluate_with_neural_network(&mut self, board: &Board, our_snake: &Battlesnake) -> Result<f32> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+710 |     pub fn get_move_probabilities(&mut self, board: &Board, our_snake: &Battlesnake) -> Result<Array2<f32>> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+727 |     pub fn get_win_probability(&mut self, board: &Board, our_snake: &Battlesnake) -> Result<f32> {
+    |            ^^^^^^^^^^^^^^^^^^^
+...
+744 |     fn heuristic_position_evaluation(&self, board: &Board, our_snake: &Battlesnake) -> f32 {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+758 |     fn heuristic_win_probability(&self, board: &Board, our_snake: &Battlesnake) -> f32 {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+767 |     pub fn set_fallback_enabled(&mut self, enabled: bool) {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+772 |     pub fn set_confidence_threshold(&mut self, threshold: f32) {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `get_neural_network_evaluator` is never used
+   --> src/neural_network.rs:786:8
+    |
+786 | pub fn get_neural_network_evaluator() -> Arc<Mutex<NeuralNetworkEvaluator>> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `initialize_neural_networks` is never used
+   --> src/neural_network.rs:791:8
+    |
+791 | pub fn initialize_neural_networks(model_dir: &str) -> Result<()> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field `config` is never read
+  --> src/unified_confidence.rs:13:5
+   |
+12 | pub struct UnifiedConfidenceCalculator {
+   |            --------------------------- field in this struct
+13 |     config: ConfidenceConfig,
+   |     ^^^^^^
+   |
+   = note: `UnifiedConfidenceCalculator` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: multiple associated items are never used
+   --> src/unified_confidence.rs:146:12
+    |
+139 | impl UnifiedConfidenceCalculator {
+    | -------------------------------- associated items in this implementation
+...
+146 |     pub fn with_config(config: ConfidenceConfig) -> Self {
+    |            ^^^^^^^^^^^
+...
+151 |     pub fn calculate_move_confidence(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+223 |     pub fn calculate_value_confidence(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+286 |     pub fn calculate_consistency_confidence(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+341 |     fn calculate_entropy(&self, probabilities: &[f32]) -> f32 {
+    |        ^^^^^^^^^^^^^^^^^
+...
+355 |     fn classify_move_confidence(&self, normalized_entropy: f32, max_prob: f32) -> ConfidenceLevel {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+369 |     fn classify_value_confidence(&self, deviation: f32, thresholds: &ValueThresholds) -> ConfidenceLevel {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+379 |     fn generate_move_recommendations(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+404 |     fn generate_value_recommendations(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+431 |     pub fn update_thresholds_from_analysis(&mut self, _analysis_data: &str) -> Result<()> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+443 |     pub fn get_config(&self) -> &ConfidenceConfig {
+    |            ^^^^^^^^^^
+...
+448 |     pub fn set_config(&mut self, config: ConfidenceConfig) {
+    |            ^^^^^^^^^^
+
+warning: fields `confidence_calculator`, `metrics_collector`, and `decision_history` are never read
+  --> src/neural_confidence_integration.rs:17:5
+   |
+16 | pub struct EnhancedNeuralEvaluator {
+   |            ----------------------- fields in this struct
+17 |     confidence_calculator: Arc<RwLock<UnifiedConfidenceCalculator>>,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+18 |     metrics_collector: Arc<RwLock<ConfidenceMetricsCollector>>,
+   |     ^^^^^^^^^^^^^^^^^
+19 |     decision_history: Arc<RwLock<Vec<NeuralDecisionRecord>>>,
+   |     ^^^^^^^^^^^^^^^^
+
+warning: multiple fields are never read
+  --> src/neural_confidence_integration.rs:25:9
+   |
+24 | pub struct ConfidenceMetricsCollector {
+   |            -------------------------- fields in this struct
+25 |     pub total_decisions: u64,
+   |         ^^^^^^^^^^^^^^^
+26 |     pub neural_network_decisions: u64,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+27 |     pub high_confidence_decisions: u64,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+28 |     pub medium_confidence_decisions: u64,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+29 |     pub low_confidence_decisions: u64,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+30 |     pub safety_fallbacks: u64,
+   |         ^^^^^^^^^^^^^^^^
+31 |     pub confidence_score_history: Vec<f32>,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+32 |     pub decision_outcome_correlation: Vec<(f32, bool)>, // (confidence, was_good_move)
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `ConfidenceMetricsCollector` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: struct `NeuralDecisionResult` is never constructed
+  --> src/neural_confidence_integration.rs:68:12
+   |
+68 | pub struct NeuralDecisionResult {
+   |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `DecisionSource` is never used
+  --> src/neural_confidence_integration.rs:78:10
+   |
+78 | pub enum DecisionSource {
+   |          ^^^^^^^^^^^^^^
+
+warning: struct `MoveEvaluation` is never constructed
+  --> src/neural_confidence_integration.rs:86:12
+   |
+86 | pub struct MoveEvaluation {
+   |            ^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> src/neural_confidence_integration.rs:124:12
+    |
+110 | impl EnhancedNeuralEvaluator {
+    | ---------------------------- methods in this implementation
+...
+124 |     pub fn make_neural_decision(
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+200 |     fn create_unified_confidence(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+255 |     fn make_decision_from_confidence(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+354 |     fn handle_missing_neural_output(&self, model_type: &str, safe_moves: &[String]) -> Result<NeuralDecisionResult> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+392 |     fn record_decision(
+    |        ^^^^^^^^^^^^^^^
+...
+429 |     fn update_metrics(
+    |        ^^^^^^^^^^^^^^
+...
+458 |     fn calculate_board_hash(&self, board: &Board, turn: u32) -> u64 {
+    |        ^^^^^^^^^^^^^^^^^^^^
+...
+489 |     pub fn get_metrics(&self) -> ConfidenceMetricsCollector {
+    |            ^^^^^^^^^^^
+...
+494 |     pub fn get_recent_decisions(&self, count: usize) -> Vec<NeuralDecisionRecord> {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+501 |     pub fn update_confidence_config(&self, config: crate::unified_confidence::ConfidenceConfig) {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+507 |     pub fn export_analysis_data(&self) -> Result<String> {
+    |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `NeuralNetworkOutputs` is never constructed
+   --> src/neural_confidence_integration.rs:536:12
+    |
+536 | pub struct NeuralNetworkOutputs {
+    |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `validation_data`, `outcome_correlations`, `threshold_performance`, and `calibration_metrics` are never read
+  --> src/confidence_validation.rs:15:5
+   |
+14 | pub struct ConfidenceValidator {
+   |            ------------------- fields in this struct
+15 |     validation_data: Vec<ValidationRecord>,
+   |     ^^^^^^^^^^^^^^^
+16 |     outcome_correlations: HashMap<String, ConfidenceCorrelation>,
+   |     ^^^^^^^^^^^^^^^^^^^^
+17 |     threshold_performance: ThresholdPerformanceTracker,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+18 |     calibration_metrics: CalibrationMetrics,
+   |     ^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> src/confidence_validation.rs:103:12
+    |
+ 92 | impl ConfidenceValidator {
+    | ------------------------ methods in this implementation
+...
+103 |     pub fn record_decision_outcome(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+...
+145 |     pub fn analyze_correlations(&mut self) -> Result<()> {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+178 |     pub fn optimize_thresholds(&mut self, threshold_candidates: &[f32]) -> Result<HashMap<String, f32>> {
+    |            ^^^^^^^^^^^^^^^^^^^
+...
+222 |     pub fn generate_optimized_config(&self) -> Result<ConfidenceConfig> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+268 |     pub fn get_outcome_correlations(&self) -> &HashMap<String, ConfidenceCorrelation> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+273 |     pub fn export_validation_report(&self) -> Result<String> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+295 |     fn generate_recommendations(&self) -> Vec<String> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+334 |     fn outcome_to_score(&self, outcome: &DecisionOutcome) -> f32 {
+    |        ^^^^^^^^^^^^^^^^
+...
+344 |     fn create_validation_context(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+363 |     fn calculate_correlation(&self) -> Result<ConfidenceCorrelation> {
+    |        ^^^^^^^^^^^^^^^^^^^^^
+...
+367 |     fn calculate_correlation_for_subset(&self, data: &[&ValidationRecord]) -> Result<ConfidenceCorrelation> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+439 |     fn test_threshold(&self, threshold: f32) -> Result<ThresholdTestResult> {
+    |        ^^^^^^^^^^^^^^
+...
+479 |     fn update_calibration_metrics(&mut self) -> Result<()> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `neural_evaluator`, `validator`, `config`, `adaptation_state`, `decision_history`, and `optimization_scheduler` are never read
+  --> src/adaptive_neural_system.rs:19:5
+   |
+17 | pub struct AdaptiveNeuralSystem {
+   |            -------------------- fields in this struct
+18 |     /// Core neural evaluation system
+19 |     neural_evaluator: Arc<Mutex<EnhancedNeuralEvaluator>>,
+   |     ^^^^^^^^^^^^^^^^
+...
+22 |     validator: Arc<Mutex<ConfidenceValidator>>,
+   |     ^^^^^^^^^
+...
+25 |     config: Arc<Mutex<ConfidenceConfig>>,
+   |     ^^^^^^
+...
+28 |     adaptation_state: AdaptationState,
+   |     ^^^^^^^^^^^^^^^^
+...
+31 |     decision_history: Vec<HistoricalDecision>,
+   |     ^^^^^^^^^^^^^^^^
+...
+34 |     optimization_scheduler: OptimizationScheduler,
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `SystemStatus` is never constructed
+  --> src/adaptive_neural_system.rs:97:12
+   |
+97 | pub struct SystemStatus {
+   |            ^^^^^^^^^^^^
+
+warning: struct `OptimizationReport` is never constructed
+   --> src/adaptive_neural_system.rs:108:12
+    |
+108 | pub struct OptimizationReport {
+    |            ^^^^^^^^^^^^^^^^^^
+
+warning: struct `OptimizationResult` is never constructed
+   --> src/adaptive_neural_system.rs:119:12
+    |
+119 | pub struct OptimizationResult {
+    |            ^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> src/adaptive_neural_system.rs:164:12
+    |
+127 | impl AdaptiveNeuralSystem {
+    | ------------------------- methods in this implementation
+...
+164 |     pub fn make_enhanced_move_decision(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+235 |     pub fn record_decision_outcome(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+...
+289 |     pub fn record_game_outcome(&mut self, game_outcome: GameOutcome, final_score: Option<f32>) -> Result<()> {
+    |            ^^^^^^^^^^^^^^^^^^^
+...
+320 |     pub fn get_system_status(&self) -> SystemStatus {
+    |            ^^^^^^^^^^^^^^^^^
+...
+347 |     pub fn force_optimization(&mut self) -> Result<OptimizationReport> {
+    |            ^^^^^^^^^^^^^^^^^^
+...
+353 |     pub fn export_system_analysis(&self) -> Result<String> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+378 |     fn record_decision_made(&mut self, decision_record: &NeuralDecisionRecord) {
+    |        ^^^^^^^^^^^^^^^^^^^^
+...
+395 |     fn should_trigger_optimization(&self) -> bool {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+420 |     fn run_optimization_cycle(&mut self) -> Result<OptimizationReport> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^
+...
+477 |     fn run_specific_optimization(&mut self, optimization_type: OptimizationType) -> Result<OptimizationResult> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+494 |     fn optimize_thresholds(&mut self) -> Result<OptimizationResult> {
+    |        ^^^^^^^^^^^^^^^^^^^
+...
+528 |     fn optimize_confidence_weights(&mut self) -> Result<OptimizationResult> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+563 |     fn optimize_safety_parameters(&mut self) -> Result<OptimizationResult> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+578 |     fn analyze_model_performance(&mut self) -> Result<OptimizationResult> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+607 |     fn update_performance_metrics(&mut self) {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+630 |     fn outcome_to_performance_impact(&self, outcome: &DecisionOutcome) -> f32 {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+640 |     fn decisions_until_next_optimization(&self) -> u64 {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+648 |     fn calculate_recent_performance_trend(&self) -> f32 {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+662 |     fn calculate_performance_distribution(&self) -> HashMap<String, f32> {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple associated functions are never used
+   --> src/enhanced_decision_system.rs:42:12
+    |
+ 20 | impl EnhancedDecisionSystem {
+    | --------------------------- associated functions in this implementation
+...
+ 42 |     pub fn is_available() -> bool {
+    |            ^^^^^^^^^^^^
+...
+ 50 |     pub fn choose_enhanced_move(
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+ 79 |     pub fn record_move_outcome(
+    |            ^^^^^^^^^^^^^^^^^^^
+...
+119 |     pub fn record_game_outcome(outcome: GameResult, final_length: Option<usize>) -> Result<()> {
+    |            ^^^^^^^^^^^^^^^^^^^
+...
+143 |     pub fn get_performance_metrics() -> Option<PerformanceMetrics> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+...
+168 |     pub fn force_optimization() -> Result<String> {
+    |            ^^^^^^^^^^^^^^^^^^
+...
+186 |     pub fn export_system_analysis() -> Result<String> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `MoveOutcome` is never used
+   --> src/enhanced_decision_system.rs:204:10
+    |
+204 | pub enum MoveOutcome {
+    |          ^^^^^^^^^^^
+
+warning: struct `MoveContext` is never constructed
+   --> src/enhanced_decision_system.rs:214:12
+    |
+214 | pub struct MoveContext {
+    |            ^^^^^^^^^^^
+
+warning: enum `GameResult` is never used
+   --> src/enhanced_decision_system.rs:228:10
+    |
+228 | pub enum GameResult {
+    |          ^^^^^^^^^^
+
+warning: struct `PerformanceMetrics` is never constructed
+   --> src/enhanced_decision_system.rs:236:12
+    |
+236 | pub struct PerformanceMetrics {
+    |            ^^^^^^^^^^^^^^^^^^
+
+warning: function `assess_move_outcome_automatically` is never used
+   --> src/enhanced_decision_system.rs:248:8
+    |
+248 | pub fn assess_move_outcome_automatically(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `is_position_dangerous` is never used
+   --> src/enhanced_decision_system.rs:296:4
+    |
+296 | fn is_position_dangerous(board: &Board, pos: &Coord, you: &Battlesnake) -> bool {
+    |    ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `make_fallback_decision` is never used
+   --> src/enhanced_decision_system.rs:335:8
+    |
+335 | pub fn make_fallback_decision(safe_moves: &[String]) -> String {
+    |        ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `create_move_context` is never used
+   --> src/enhanced_decision_system.rs:359:8
+    |
+359 | pub fn create_move_context(
+    |        ^^^^^^^^^^^^^^^^^^^
+
+warning: function `calculate_min_food_distance` is never used
+   --> src/enhanced_decision_system.rs:382:4
+    |
+382 | fn calculate_min_food_distance(head: &Coord, food: &[Coord]) -> f32 {
+    |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `calculate_position_danger_level` is never used
+   --> src/enhanced_decision_system.rs:393:4
+    |
+393 | fn calculate_position_danger_level(pos: &Coord, board: &Board, you: &Battlesnake) -> f32 {
+    |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `count_safe_moves` is never used
+   --> src/enhanced_decision_system.rs:433:4
+    |
+433 | fn count_safe_moves(board: &Board, you: &Battlesnake) -> u32 {
+    |    ^^^^^^^^^^^^^^^^
+
+warning: method `with_turn` is never used
+  --> src/types.rs:53:12
+   |
+52 | impl Board {
+   | ---------- method in this implementation
+53 |     pub fn with_turn(mut self, turn: i32) -> Self {
+   |            ^^^^^^^^^
+
+warning: `starter-snake-rust` (bin "starter-snake-rust") generated 115 warnings (49 duplicates) (run `cargo fix --bin "starter-snake-rust"` to apply 4 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running `target/debug/starter-snake-rust`
+[2025-11-13T20:56:20Z INFO  starter_snake_rust::enhanced_decision_system] Enhanced neural decision system initialized successfully
+[2025-11-13T20:56:20Z INFO  starter_snake_rust] Enhanced neural decision system initialized successfully
+[2025-11-13T20:56:20Z INFO  starter_snake_rust] Starting Battlesnake Server...
+[2025-11-13T20:56:20Z INFO  rocket::launch] Configured for debug.
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] address: 0.0.0.0
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] port: 8001
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] workers: 16
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] max blocking threads: 512
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] ident: Rocket
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] IP header: X-Real-IP
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] limits: bytes = 8KiB, data-form = 2MiB, file = 1MiB, form = 32KiB, json = 1MiB, msgpack = 1MiB, string = 8KiB
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] temp dir: /tmp
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] http/2: true
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] keep-alive: disabled
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] tls: disabled
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] shutdown: ctrlc = true, force = true, signals = [SIGTERM], grace = 2s, mercy = 3s
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] log level: normal
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] cli colors: true
+[2025-11-13T20:56:20Z INFO  rocket::launch] Routes:
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] (handle_index) GET /
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] (handle_end) POST /end application/json
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] (handle_move) POST /move application/json
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] (handle_start) POST /start application/json
+[2025-11-13T20:56:20Z INFO  rocket::launch] Fairings:
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] Server ID Middleware (response)
+[2025-11-13T20:56:20Z INFO  rocket::launch::_] Shield (liftoff, response, singleton)
+[2025-11-13T20:56:20Z INFO  rocket::shield::shield] Shield:
+[2025-11-13T20:56:20Z INFO  rocket::shield::shield::_] Permissions-Policy: interest-cohort=()
+[2025-11-13T20:56:20Z INFO  rocket::shield::shield::_] X-Content-Type-Options: nosniff
+[2025-11-13T20:56:20Z INFO  rocket::shield::shield::_] X-Frame-Options: SAMEORIGIN
+[2025-11-13T20:56:20Z WARN  rocket::launch] Rocket has launched from http://0.0.0.0:8001
+[2025-11-13T20:56:30Z WARN  rocket::server] Received SIGTERM. Requesting shutdown.
+[2025-11-13T20:56:30Z INFO  rocket::server] Shutdown requested. Waiting for pending I/O...
+[2025-11-13T20:56:30Z INFO  rocket::server] Graceful shutdown completed successfully.

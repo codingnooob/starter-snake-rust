@@ -1,0 +1,48 @@
+{
+  "timestamp": "2025-11-13T14:36:16.353745",
+  "total_games": 2,
+  "successful_games": 0,
+  "failed_games": 2,
+  "success_rate": 0.0,
+  "average_turns": 0.0,
+  "average_execution_time": 1.6563307046890259,
+  "common_parsing_errors": {
+    "Error indicator found: 422": 1,
+    "Error indicator found: 400": 1,
+    "Error indicator found: 500": 2,
+    "Error indicator found: timeout": 1
+  },
+  "exit_code_distribution": {
+    "0": 1,
+    "1": 1
+  },
+  "detailed_results": [
+    {
+      "game_id": "diagnostic_solo_11x11_diagnostic",
+      "turns": 0,
+      "winner": null,
+      "exit_code": 0,
+      "execution_time": 3.3082737922668457,
+      "parsing_errors": [
+        "Error indicator found: 422",
+        "Error indicator found: 400",
+        "Error indicator found: 500"
+      ],
+      "output_length": 0,
+      "error_length": 60829
+    },
+    {
+      "game_id": "diagnostic_multi_2snakes_diagnostic",
+      "turns": 0,
+      "winner": null,
+      "exit_code": 1,
+      "execution_time": 0.004387617111206055,
+      "parsing_errors": [
+        "Error indicator found: timeout",
+        "Error indicator found: 500"
+      ],
+      "output_length": 20,
+      "error_length": 1830
+    }
+  ]
+}

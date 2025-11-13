@@ -1,0 +1,71 @@
+{
+  "export_config": {
+    "opset_version": 17,
+    "dynamic_axes": false,
+    "export_params": true,
+    "do_constant_folding": true,
+    "batch_size": 1,
+    "board_channels": 12,
+    "board_size": 11,
+    "snake_features_dim": 32,
+    "game_context_dim": 16,
+    "enable_optimization": true,
+    "optimization_level": "all",
+    "tolerance_absolute": 1e-05,
+    "tolerance_relative": 0.0001,
+    "num_validation_samples": 50,
+    "max_model_size_mb": 50.0,
+    "individual_model_limit_mb": 20.0,
+    "output_dir": "test_onnx_models",
+    "model_names": {
+      "position_evaluator": "position_evaluation.onnx",
+      "move_predictor": "move_prediction.onnx",
+      "game_outcome": "game_outcome.onnx"
+    }
+  },
+  "export_results": {
+    "position_evaluator": {
+      "export_success": true,
+      "optimize_success": true,
+      "validate_success": true,
+      "model_path": "test_onnx_models/position_evaluation.onnx",
+      "model_size_mb": 19.023856163024902,
+      "benchmark_results": {
+        "avg_inference_time_ms": 2.833526134490967,
+        "inference_rate_fps": 352.9171613515563,
+        "num_runs": 100
+      }
+    },
+    "move_predictor": {
+      "export_success": true,
+      "optimize_success": true,
+      "validate_success": true,
+      "model_path": "test_onnx_models/move_prediction.onnx",
+      "model_size_mb": 19.024113655090332,
+      "benchmark_results": {
+        "avg_inference_time_ms": 2.904508113861084,
+        "inference_rate_fps": 344.2923761265236,
+        "num_runs": 100
+      }
+    },
+    "game_outcome": {
+      "export_success": true,
+      "optimize_success": true,
+      "validate_success": true,
+      "model_path": "test_onnx_models/game_outcome.onnx",
+      "model_size_mb": 19.023547172546387,
+      "benchmark_results": {
+        "avg_inference_time_ms": 2.1892642974853516,
+        "inference_rate_fps": 456.7744521064118,
+        "num_runs": 100
+      }
+    }
+  },
+  "summary": {
+    "successful_exports": 3,
+    "successful_validations": 3,
+    "total_models": 3,
+    "total_size_mb": 57.07151699066162,
+    "size_check_passed": false,
+    "average_inference_time_ms": 2.6424328486124673,
+    "meets_performance_requirements": 

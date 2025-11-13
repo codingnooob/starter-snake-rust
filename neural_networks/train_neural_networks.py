@@ -32,13 +32,13 @@ warnings.filterwarnings('ignore')
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 sys.path.append(str(PROJECT_ROOT))
 
-from neural_networks.neural_models import (
-    ModelConfig, PositionEvaluatorNetwork, MovePredictorNetwork, 
+from neural_models import (
+    ModelConfig, PositionEvaluatorNetwork, MovePredictorNetwork,
     GameOutcomePredictor, MultiTaskBattlesnakeNetwork,
-    create_position_evaluator, create_move_predictor, 
+    create_position_evaluator, create_move_predictor,
     create_game_outcome_predictor, create_multitask_network
 )
-from neural_networks.heuristic_supervision import (
+from heuristic_supervision import (
     HeuristicTrainingTarget, HeuristicScores
 )
 
@@ -836,7 +836,7 @@ if __name__ == "__main__":
     print("=" * 50)
     
     # Create sample training data (normally would load from heuristic supervision)
-    from neural_networks.heuristic_supervision import HeuristicScores, HeuristicTrainingTarget
+    from heuristic_supervision import HeuristicScores, HeuristicTrainingTarget
     
     # Create sample heuristic scores (sophisticated instead of 0.12 placeholder)
     sample_heuristic_scores = HeuristicScores(

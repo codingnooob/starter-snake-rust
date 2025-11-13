@@ -1,0 +1,35 @@
+2025-11-13 14:35:04,869 - INFO - 🚀 STARTING POST-TRAINING VALIDATION DIAGNOSTICS
+2025-11-13 14:35:04,870 - INFO - ============================================================
+2025-11-13 14:35:04,870 - INFO - 🔍 DIAGNOSTIC: Checking server health...
+2025-11-13 14:35:04,871 - DEBUG - Starting new HTTP connection (1): localhost:8001
+2025-11-13 14:35:04,873 - DEBUG - http://localhost:8001 "GET / HTTP/1.1" 200 100
+2025-11-13 14:35:04,874 - DEBUG - Server status code: 200
+2025-11-13 14:35:04,874 - DEBUG - Server response: {"apiversion":"1","author":"starter-snake-rust","color":"#888888","head":"default","tail":"default"}
+2025-11-13 14:35:04,874 - INFO - ✅ Server connectivity: GOOD
+2025-11-13 14:35:04,874 - DEBUG - Testing move endpoint with payload: {"game": {"id": "diagnostic-test", "turn": 1, "ruleset": {"name": "standard"}}, "board": {"height": 11, "width": 11, "food": [], "snakes": []}, "you": {"id": "diagnostic", "health": 100, "body": [{"x": 5, "y": 5}]}}
+2025-11-13 14:35:04,875 - DEBUG - Starting new HTTP connection (1): localhost:8001
+2025-11-13 14:35:04,876 - DEBUG - http://localhost:8001 "POST /move HTTP/1.1" 422 496
+2025-11-13 14:35:04,877 - DEBUG - Move endpoint status: 422
+2025-11-13 14:35:04,877 - DEBUG - Move endpoint response: <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="color-scheme" content="light dark">
+    <title>422 Unprocessable Entity</title>
+</head>
+<body align="center">
+    <div role="main" align="center">
+        <h1>422: Unprocessable Entity</h1>
+        <p>The request was well-formed but was unable to be followed due to semantic errors.</p>
+        <hr />
+    </div>
+    <div role="contentinfo" align="center">
+        <small>Rocket</small>
+    </div>
+</body>
+</html>
+2025-11-13 14:35:04,877 - ERROR - 🚨 CRITICAL: Server rejecting move requests with 422 - JSON format issue!
+2025-11-13 14:35:04,877 - ERROR - This is likely the root cause of game failures
+2025-11-13 14:35:04,877 - ERROR - ❌ Server health check failed - aborting diagnostics
+2025-11-13 14:35:04,877 - INFO - 💾 Diagnostic results saved to: diagnostic_results_20251113_143504.json
+2025-11-13 14:35:04,877 - ERROR - ❌ Diagnostic failed: 'total_games'

@@ -1,0 +1,79 @@
+2025-11-13 14:36:13,028 - INFO - 🚀 STARTING POST-TRAINING VALIDATION DIAGNOSTICS
+2025-11-13 14:36:13,028 - INFO - ============================================================
+2025-11-13 14:36:13,028 - INFO - 🔍 DIAGNOSTIC: Checking server health...
+2025-11-13 14:36:13,029 - DEBUG - Starting new HTTP connection (1): localhost:8001
+2025-11-13 14:36:13,031 - DEBUG - http://localhost:8001 "GET / HTTP/1.1" 200 100
+2025-11-13 14:36:13,031 - DEBUG - Server status code: 200
+2025-11-13 14:36:13,031 - DEBUG - Server response: {"apiversion":"1","author":"starter-snake-rust","color":"#888888","head":"default","tail":"default"}
+2025-11-13 14:36:13,032 - INFO - ✅ Server connectivity: GOOD
+2025-11-13 14:36:13,032 - DEBUG - Testing move endpoint with payload: {"game": {"id": "diagnostic-test", "turn": 1, "ruleset": {"name": "standard"}}, "board": {"height": 11, "width": 11, "food": [], "snakes": []}, "you": {"id": "diagnostic", "health": 100, "body": [{"x": 5, "y": 5}]}}
+2025-11-13 14:36:13,032 - DEBUG - Starting new HTTP connection (1): localhost:8001
+2025-11-13 14:36:13,038 - DEBUG - http://localhost:8001 "POST /move HTTP/1.1" 200 93
+2025-11-13 14:36:13,038 - DEBUG - Move endpoint status: 200
+2025-11-13 14:36:13,038 - DEBUG - Move endpoint response: {"confidence":0.49504950642585754,"decision_source":"neural_network_override","move":"right"}
+2025-11-13 14:36:13,038 - INFO - ✅ Move endpoint: WORKING
+2025-11-13 14:36:13,038 - INFO - 🎮 Running 2 diagnostic games...
+2025-11-13 14:36:13,038 - INFO - 🎮 DIAGNOSTIC: Running game diagnostic_solo_11x11_diagnostic
+2025-11-13 14:36:13,038 - DEBUG - Command: battlesnake play -W 11 -H 11 --name Post-Training Diagnostic --url http://localhost:8001 -g solo --timeout 1000
+2025-11-13 14:36:16,347 - DEBUG - Game completed in 3.31s
+2025-11-13 14:36:16,347 - DEBUG - Exit code: 0
+2025-11-13 14:36:16,347 - DEBUG - STDOUT length: 0 chars
+2025-11-13 14:36:16,347 - DEBUG - STDERR length: 60829 chars
+2025-11-13 14:36:16,347 - DEBUG - === RAW STDERR START ===
+2025-11-13 14:36:16,347 - DEBUG - STDERR[ 1]: INFO 14:36:13.044713 Snake ID: 3e34db83-24b0-4444-91ca-e5c0e1d21675 URL: http://localhost:8001, Name: "Post-Training Diagnostic"
+2025-11-13 14:36:16,347 - DEBUG - STDERR[ 2]: INFO 14:36:13.046300 Ruleset: solo, Seed: 1763073373042669035
+2025-11-13 14:36:16,347 - DEBUG - STDERR[ 3]: INFO 14:36:13.046309 Turn: 0, Snakes Alive: [Post-Training Diagnostic], Food: 2, Hazards: 0
+2025-11-13 14:36:16,347 - DEBUG - STDERR[ 4]: INFO 14:36:13.052581 Turn: 1, Snakes Alive: [Post-Training Diagnostic], Food: 2, Hazards: 0
+2025-11-13 14:36:16,347 - DEBUG - STDERR[ 5]: INFO 14:36:13.064012 Turn: 2, Snakes Alive: [Post-Training Diagnostic], Food: 2, Hazards: 0
+2025-11-13 14:36:16,347 - DEBUG - STDERR[ 6]: INFO 14:36:13.070692 Turn: 3, Snakes Alive: [Post-Training Diagnostic], Food: 2, Hazards: 0
+2025-11-13 14:36:16,347 - DEBUG - STDERR[ 7]: INFO 14:36:13.077209 Turn: 4, Snakes Alive: [Post-Training Diagnostic], Food: 2, Hazards: 0
+2025-11-13 14:36:16,347 - DEBUG - STDERR[ 8]: INFO 14:36:13.083967 Turn: 5, Snakes Alive: [Post-Training Diagnostic], Food: 2, Hazards: 0
+2025-11-13 14:36:16,347 - DEBUG - STDERR[ 9]: INFO 14:36:13.090255 Turn: 6, Snakes Alive: [Post-Training Diagnostic], Food: 2, Hazards: 0
+2025-11-13 14:36:16,347 - DEBUG - STDERR[10]: INFO 14:36:13.096280 Turn: 7, Snakes Alive: [Post-Training Diagnostic], Food: 2, Hazards: 0
+2025-11-13 14:36:16,347 - DEBUG - === RAW STDERR END ===
+2025-11-13 14:36:16,347 - DEBUG - 🔍 DIAGNOSTIC: Parsing game output...
+2025-11-13 14:36:16,347 - DEBUG - Event counts: START=0, MOVES=0, END=0
+2025-11-13 14:36:16,348 - DEBUG - Final parsed turns: 0
+2025-11-13 14:36:16,348 - WARNING - Parsing errors: ['Error indicator found: 422', 'Error indicator found: 400', 'Error indicator found: 500']
+2025-11-13 14:36:16,348 - INFO - 📊 GAME RESULT: diagnostic_solo_11x11_diagnostic
+2025-11-13 14:36:16,348 - INFO -    Turns: 0
+2025-11-13 14:36:16,348 - INFO -    Exit Code: 0
+2025-11-13 14:36:16,348 - INFO -    Execution Time: 3.31s
+2025-11-13 14:36:16,348 - INFO -    Parsing Errors: 3
+2025-11-13 14:36:16,348 - WARNING -    ⚠️ Error indicator found: 422
+2025-11-13 14:36:16,348 - WARNING -    ⚠️ Error indicator found: 400
+2025-11-13 14:36:16,348 - WARNING -    ⚠️ Error indicator found: 500
+2025-11-13 14:36:16,348 - INFO - 🎮 DIAGNOSTIC: Running game diagnostic_multi_2snakes_diagnostic
+2025-11-13 14:36:16,348 - DEBUG - Command: battlesnake play -W 11 -H 11 --name Post-Training Diagnostic --url http://localhost:8001 -g standard --timeout 1000 --num 2
+2025-11-13 14:36:16,352 - DEBUG - Game completed in 0.00s
+2025-11-13 14:36:16,353 - DEBUG - Exit code: 1
+2025-11-13 14:36:16,353 - DEBUG - STDOUT length: 20 chars
+2025-11-13 14:36:16,353 - DEBUG - STDERR length: 1830 chars
+2025-11-13 14:36:16,353 - DEBUG - === RAW STDOUT START ===
+2025-11-13 14:36:16,353 - DEBUG - STDOUT[ 1]: unknown flag: --num
+2025-11-13 14:36:16,353 - DEBUG - STDOUT[ 2]: 
+2025-11-13 14:36:16,353 - DEBUG - === RAW STDOUT END ===
+2025-11-13 14:36:16,353 - DEBUG - === RAW STDERR START ===
+2025-11-13 14:36:16,353 - DEBUG - STDERR[ 1]: Error: unknown flag: --num
+2025-11-13 14:36:16,353 - DEBUG - STDERR[ 2]: Usage:
+2025-11-13 14:36:16,353 - DEBUG - STDERR[ 3]:   battlesnake play [flags]
+2025-11-13 14:36:16,353 - DEBUG - STDERR[ 4]: 
+2025-11-13 14:36:16,353 - DEBUG - STDERR[ 5]: Flags:
+2025-11-13 14:36:16,353 - DEBUG - STDERR[ 6]:   -W, --width int                 Width of Board (default 11)
+2025-11-13 14:36:16,353 - DEBUG - STDERR[ 7]:   -H, --height int                Height of Board (default 11)
+2025-11-13 14:36:16,353 - DEBUG - STDERR[ 8]:   -n, --name stringArray          Name of Snake
+2025-11-13 14:36:16,353 - DEBUG - STDERR[ 9]:   -u, --url stringArray           URL of Snake
+2025-11-13 14:36:16,353 - DEBUG - STDERR[10]:   -t, --timeout int               Request Timeout (default 500)
+2025-11-13 14:36:16,353 - DEBUG - === RAW STDERR END ===
+2025-11-13 14:36:16,353 - DEBUG - 🔍 DIAGNOSTIC: Parsing game output...
+2025-11-13 14:36:16,353 - DEBUG - Event counts: START=0, MOVES=0, END=0
+2025-11-13 14:36:16,353 - DEBUG - Final parsed turns: 0
+2025-11-13 14:36:16,353 - WARNING - Parsing errors: ['Error indicator found: timeout', 'Error indicator found: 500']
+2025-11-13 14:36:16,353 - INFO - 📊 GAME RESULT: diagnostic_multi_2snakes_diagnostic
+2025-11-13 14:36:16,353 - INFO -    Turns: 0
+2025-11-13 14:36:16,353 - INFO -    Exit Code: 1
+2025-11-13 14:36:16,353 - INFO -    Execution Time: 0.00s
+2025-11-13 14:36:16,353 - INFO -    Parsing Errors: 2
+2025-11-13 14:36:16,353 - WARNING -    ⚠️ Error indicator found: timeout
+2025-11-13 14:36:16,353 - WARNING -    ⚠️ Error indicator found: 500
+2025-11-13 14:36:16,353 - INFO - 💾 Diagnostic results saved to: diagnostic_results_20251113_143616.json

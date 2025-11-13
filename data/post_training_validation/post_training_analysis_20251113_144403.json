@@ -1,0 +1,139 @@
+{
+  "execution_summary": {
+    "total_games": 74,
+    "solo_games": 50,
+    "multi_snake_games": 24,
+    "execution_time": 433.43636441230774,
+    "active_ports": [
+      8001
+    ],
+    "timestamp": "2025-11-13T14:44:03.060368",
+    "neural_networks_status": "Enhanced ONNX Models Active"
+  },
+  "training_validation_results": {
+    "improvement_summary": {
+      "avg_survival": "TrainingImprovementMetrics(baseline_metric=44.3, post_training_metric=np.float64(0.0), absolute_improvement=np.float64(-44.3), percentage_improvement=np.float64(-100.0), statistical_significance=np.True_, confidence_interval=(np.float64(-37.655), np.float64(-50.94499999999999)), effect_size=np.float64(-10.0))",
+      "neural_usage_rate": "TrainingImprovementMetrics(baseline_metric=76.9, post_training_metric=np.float64(0.0), absolute_improvement=np.float64(-76.9), percentage_improvement=np.float64(-100.0), statistical_significance=np.True_, confidence_interval=(np.float64(-65.36500000000001), np.float64(-88.435)), effect_size=np.float64(-9.999999999999998))",
+      "movement_entropy": "TrainingImprovementMetrics(baseline_metric=1.535, post_training_metric=np.float64(0.0), absolute_improvement=np.float64(-1.535), percentage_improvement=np.float64(-100.0), statistical_significance=np.True_, confidence_interval=(np.float64(-1.3047499999999999), np.float64(-1.76525)), effect_size=np.float64(-10.0))",
+      "success_rate": "TrainingImprovementMetrics(baseline_metric=72.7, post_training_metric=0.0, absolute_improvement=-72.7, percentage_improvement=-100.0, statistical_significance=True, confidence_interval=(-61.795, -83.605), effect_size=-10.0)"
+    },
+    "statistical_analysis": {
+      "sample_size": 74,
+      "statistical_power": "moderate",
+      "significance_summary": {
+        "avg_survival": {
+          "significant": "True",
+          "effect_size": -10.0,
+          "percentage_change": -100.0
+        },
+        "neural_usage_rate": {
+          "significant": "True",
+          "effect_size": -9.999999999999998,
+          "percentage_change": -100.0
+        },
+        "movement_entropy": {
+          "significant": "True",
+          "effect_size": -10.0,
+          "percentage_change": -100.0
+        },
+        "success_rate": {
+          "significant": true,
+          "effect_size": -10.0,
+          "percentage_change": -100.0
+        }
+      },
+      "effect_size_interpretation": {
+        "avg_survival": "large",
+        "neural_usage_rate": "large",
+        "movement_entropy": "large",
+        "success_rate": "large"
+      },
+      "confidence_assessment": {
+        "avg_survival": "high",
+        "neural_usage_rate": "high",
+        "movement_entropy": "high",
+        "success_rate": "high"
+      }
+    },
+    "pattern_analysis": {
+      "average_entropy": 0.0,
+      "entropy_improvement_vs_baseline": -1.535,
+      "repetitive_behavior_rate": 0,
+      "entropy_consistency": 1.0,
+      "pattern_elimination_success": "False"
+    },
+    "neural_analysis": {
+      "average_neural_usage": 0.0,
+      "neural_usage_improvement": -76.9,
+      "average_confidence": 0,
+      "high_confidence_rate": 0.0,
+      "low_confidence_rate": 0.0,
+      "confidence_consistency": 1.0,
+      "neural_integration_improvement": "False",
+      "confidence_distribution_health": false
+    },
+    "training_success_validation": {
+      "overall_success": false,
+      "criteria_met": {
+        "survival_improvement_target": {
+          "target": 15.0,
+          "achieved": -100.0,
+          "met": "False",
+          "absolute_improvement": -44.3
+        },
+        "entropy_improvement_target": {
+          "target": 20.0,
+          "achieved": -100.0,
+          "met": "False",
+          "absolute_improvement": -1.535
+        },
+        "neural_confidence_target": {
+          "target": 10.0,
+          "achieved": -100.0,
+          "met": "False",
+          "absolute_improvement": -76.9
+        },
+        "success_rate_improvement_target": {
+          "target": 15.0,
+          "achieved": -100.0,
+          "met": false,
+          "absolute_improvement": -72.7
+        }
+      },
+      "success_score": 0.0,
+      "critical_failures": [
+        "survival_improvement_target: -100.0% (target: 15.0%)",
+        "entropy_improvement_target: -100.0% (target: 20.0%)",
+        "neural_confidence_target: -100.0% (target: 10.0%)",
+        "success_rate_improvement_target: -100.0% (target: 15.0%)"
+      ],
+      "notable_achievements": []
+    },
+    "baseline_comparison": {
+      "baseline_metrics": {
+        "avg_survival": 44.3,
+        "neural_usage_rate": 76.9,
+        "movement_entropy": 1.535,
+        "success_rate": 72.7
+      },
+      "post_training_metrics": {
+        "avg_survival": 0.0,
+        "neural_usage_rate": 0.0,
+        "movement_entropy": 0.0,
+        "success_rate": 0.0
+      },
+      "total_games_analyzed": 74
+    }
+  },
+  "performance_metrics": {
+    "average_survival": 0.0,
+    "median_survival": 0.0,
+    "max_survival": "0",
+    "average_neural_usage": 0.0,
+    "average_entropy": 0.0,
+    "success_rate": 0.0,
+    "average_response_time": 0.0,
+    "food_efficiency": 0.0
+  },
+  "training_effectiveness_score": 0.0
+}
