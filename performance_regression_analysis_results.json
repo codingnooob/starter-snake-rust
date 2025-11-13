@@ -1,0 +1,67 @@
+{
+  "analysis_timestamp": "2025-11-13T00:00:16.501474",
+  "analysis_type": "performance_regression_detection",
+  "results": {
+    "regressions": [],
+    "improvements": [
+      {
+        "metric": "average_survival_rate",
+        "baseline": 0.251,
+        "post_training": 0.271,
+        "absolute_change": 0.020000000000000018,
+        "relative_change_percent": 7.968127490039848,
+        "is_lower_better": false,
+        "category": "IMPROVEMENT",
+        "magnitude": "MODERATE"
+      },
+      {
+        "metric": "neural_confidence",
+        "baseline": 0.0,
+        "post_training": 0.386,
+        "absolute_change": 0.386,
+        "relative_change_percent": Infinity,
+        "is_lower_better": false,
+        "category": "IMPROVEMENT",
+        "magnitude": "MAJOR"
+      },
+      {
+        "metric": "response_time",
+        "baseline": 0.015,
+        "post_training": 0.008,
+        "absolute_change": -0.006999999999999999,
+        "relative_change_percent": -46.666666666666664,
+        "is_lower_better": true,
+        "category": "IMPROVEMENT",
+        "magnitude": "MAJOR"
+      }
+    ],
+    "stable_metrics": [
+      {
+        "metric": "game_completion_rate",
+        "baseline": 0.056,
+        "post_training": 0.056,
+        "absolute_change": 0.0,
+        "relative_change_percent": 0.0,
+        "is_lower_better": false,
+        "category": "STABLE"
+      },
+      {
+        "metric": "food_efficiency",
+        "baseline": 0.04,
+        "post_training": 0.043,
+        "absolute_change": 0.0029999999999999957,
+        "relative_change_percent": 7.4999999999999885,
+        "is_lower_better": false,
+        "category": "STABLE"
+      }
+    ],
+    "summary": {
+      "total_metrics": 5,
+      "regressions": 0,
+      "improvements": 3,
+      "stable": 2
+    },
+    "overall_capability_improvement": 0.38622177954847275,
+    "final_verdict": "\u2705 TRAINING SUCCESS - Zero regressions, 3 improvements"
+  }
+}

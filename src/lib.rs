@@ -15,5 +15,11 @@ pub mod enhanced_decision_system;
 pub use types::{Board, Battlesnake, Coord, Game, GameState};
 
 // Re-export advanced spatial analysis components for neural network integration
-pub use advanced_spatial_analysis::{AdvancedBoardStateEncoder, VoronoiTerritoryAnalyzer,
-                                   DangerZonePredictor, MovementHistoryTracker, StrategicPositionAnalyzer};
+// Temporarily commented out due to module structure issues - not needed for basic training validation
+/* pub use advanced_spatial_analysis::{
+    VoronoiTerritoryAnalyzer,
+    DangerZonePredictor,
+    MovementHistoryTracker,
+    StrategicPositionAnalyzer,
+    AdvancedBoardStateEncoder
+}; */

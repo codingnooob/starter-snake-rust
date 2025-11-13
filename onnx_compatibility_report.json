@@ -1,0 +1,82 @@
+{
+  "timestamp": "2025-11-13 06:35:29 UTC",
+  "test_results": {
+    "model_loading": {
+      "8-channel legacy": {
+        "loaded": 3,
+        "failed": 0,
+        "errors": []
+      },
+      "12-channel advanced": {
+        "loaded": 3,
+        "failed": 0,
+        "errors": []
+      }
+    },
+    "tensor_compatibility": {
+      "12_channel": {
+        "status": "success",
+        "pipeline_shape": "(11, 11, 12)",
+        "onnx_input_shape": "(1, 12, 11, 11)",
+        "output_shape": "(1, 1)"
+      }
+    },
+    "inference_validation": {
+      "12_channel": {
+        "position_evaluation": {
+          "output_shape": "(1, 1)",
+          "output_range": [
+            0.3518659472465515,
+            0.3518659472465515
+          ],
+          "consistent": true,
+          "sample_output": [
+            0.3518659472465515
+          ]
+        },
+        "move_prediction": {
+          "output_shape": "(1, 4)",
+          "output_range": [
+            0.17277607321739197,
+            0.3772047460079193
+          ],
+          "consistent": true,
+          "sample_output": [
+            0.17277607321739197,
+            0.21103008091449738,
+            0.3772047460079193,
+            0.23898905515670776
+          ]
+        },
+        "game_outcome": {
+          "output_shape": "(1, 1)",
+          "output_range": [
+            0.49525997042655945,
+            0.49525997042655945
+          ],
+          "consistent": true,
+          "sample_output": [
+            0.49525997042655945
+          ]
+        }
+      }
+    },
+    "performance_comparison": {
+      "error": "'Advanced12ChannelBoardEncoder' object has no attribute 'encode_12_channel_board'"
+    },
+    "summary": {},
+    "rust_integration": {
+      "status": "server_error",
+      "code": 401
+    }
+  },
+  "conclusion": {
+    "overall_success": false,
+    "model_loading": true,
+    "tensor_compatibility": true,
+    "inference_validation": true,
+    "performance_benchmark": false,
+    "total_pipeline_time_ms": "N/A",
+    "recommendation": "REQUIRES FIXES"
+  }
+}

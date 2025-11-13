@@ -1,0 +1,29 @@
+{
+  "analysis_timestamp": "2025-11-12T23:56:51.060871",
+  "analysis_type": "statistical_significance_testing",
+  "statistical_tests": [
+    "independent_t_test",
+    "cohens_d_effect_size",
+    "confidence_intervals"
+  ],
+  "significance_level": 0.05,
+  "results": {
+    "survival_rate": {
+      "metric": "Survival Rate",
+      "baseline_mean": 0.23666666666666666,
+      "baseline_std": 0.26837784309936363,
+      "baseline_ci": [
+        -0.044978606840218066,
+        0.5183119401735514
+      ],
+      "post_training_mean": 0.27099999999999996,
+      "post_training_std": 6.080941944488117e-17,
+      "post_training_ci": [
+        0.2709999999999999,
+        0.271
+      ],
+      "t_statistic": -0.3133609945751707,
+      "p_value": 0.7604447321840211,
+      "cohens_d": 0.18091905457150365,
+      "effect_size": "negligible",
+      "significant": 

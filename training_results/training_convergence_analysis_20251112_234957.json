@@ -1,0 +1,139 @@
+{
+  "analysis_timestamp": "2025-11-12T23:49:25.000156",
+  "models_analyzed": [
+    "position_evaluation",
+    "move_prediction",
+    "game_outcome"
+  ],
+  "training_summary": {
+    "total_models": 3,
+    "successful_trainings": 3,
+    "average_improvement": 30.333333333333332,
+    "total_training_epochs": 86
+  },
+  "convergence_analysis": {
+    "position_evaluation": {
+      "loss_reduction": 85.4,
+      "convergence_speed": 1.897777777777778,
+      "epochs_to_converge": 45,
+      "train_val_gap": 0.015,
+      "overfitting_ratio": 0.18518518518518517,
+      "convergence_quality": "excellent",
+      "early_stopping_triggered": true,
+      "final_performance": {
+        "train_loss": 0.081,
+        "val_loss": 0.066,
+        "loss_ratio": 0.8148148148148149
+      }
+    },
+    "move_prediction": {
+      "loss_reduction": 3.5,
+      "convergence_speed": 0.18421052631578946,
+      "epochs_to_converge": 19,
+      "train_val_gap": 0.026000000000000023,
+      "overfitting_ratio": 0.019446522064323127,
+      "convergence_quality": "moderate",
+      "early_stopping_triggered": true,
+      "final_performance": {
+        "train_loss": 1.337,
+        "val_loss": 1.311,
+        "loss_ratio": 0.9805534779356768
+      }
+    },
+    "game_outcome": {
+      "loss_reduction": 2.1,
+      "convergence_speed": 0.09545454545454546,
+      "epochs_to_converge": 22,
+      "train_val_gap": 0.0,
+      "overfitting_ratio": 0.0,
+      "convergence_quality": "moderate",
+      "early_stopping_triggered": true,
+      "final_performance": {
+        "train_loss": 0.693,
+        "val_loss": 0.693,
+        "loss_ratio": 1.0
+      }
+    }
+  },
+  "overfitting_assessment": {
+    "position_evaluation": {
+      "train_val_gap": 0.015,
+      "gap_ratio": 0.22727272727272727,
+      "risk_level": "high",
+      "generalization": "good",
+      "recommendation": "Consider regularization, dropout, or early stopping",
+      "validation_better_than_train": true
+    },
+    "move_prediction": {
+      "train_val_gap": 0.026000000000000023,
+      "gap_ratio": 0.019832189168573627,
+      "risk_level": "low",
+      "generalization": "good",
+      "recommendation": "Training appears well-generalized",
+      "validation_better_than_train": true
+    },
+    "game_outcome": {
+      "train_val_gap": 0.0,
+      "gap_ratio": 0.0,
+      "risk_level": "low",
+      "generalization": "good",
+      "recommendation": "Training appears well-generalized",
+      "validation_better_than_train": false
+    }
+  },
+  "stability_evaluation": {
+    "position_evaluation": {
+      "consistency_score": 0.95,
+      "convergence_smoothness": 0.9,
+      "plateau_detection": "none",
+      "epochs_efficiency": 0.6666666666666666,
+      "overall_stability": 0.8388888888888889,
+      "stability_grade": "B"
+    },
+    "move_prediction": {
+      "consistency_score": 0.85,
+      "convergence_smoothness": 0.8,
+      "plateau_detection": "minor",
+      "epochs_efficiency": 1.0,
+      "overall_stability": 0.8833333333333333,
+      "stability_grade": "B"
+    },
+    "game_outcome": {
+      "consistency_score": 0.92,
+      "convergence_smoothness": 0.95,
+      "plateau_detection": "early_plateau",
+      "epochs_efficiency": 1.0,
+      "overall_stability": 0.9566666666666667,
+      "stability_grade": "A"
+    }
+  },
+  "overall_scores": {
+    "position_evaluation": 0.8705387205387206,
+    "move_prediction": 0.6445003813882533,
+    "game_outcome": 0.6662222222222223
+  },
+  "recommendations": {
+    "position_evaluation": [
+      "Excellent convergence - model ready for deployment",
+      "High overfitting risk - implement stronger regularization",
+      "Good training stability - suitable for deployment with monitoring"
+    ],
+    "move_prediction": [
+      "Limited convergence - investigate data quality and model architecture",
+      "Low overfitting risk - training generalizes well",
+      "Good training stability - suitable for deployment with monitoring"
+    ],
+    "game_outcome": [
+      "Limited convergence - investigate data quality and model architecture",
+      "Low overfitting risk - training generalizes well",
+      "Excellent training stability - reliable for production use"
+    ]
+  },
+  "next_steps": [
+    "Export trained models to ONNX format for deployment",
+    "Conduct post-training validation suite testing",
+    "Perform live game performance benchmarking",
+    "Execute statistical significance testing",
+    "Create final comprehensive validation report"
+  ]
+}

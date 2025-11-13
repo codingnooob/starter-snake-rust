@@ -1,0 +1,602 @@
+{
+  "timestamp": "2025-11-13 07:26:18 UTC",
+  "scenarios": {
+    "scenario_1_simple_test": {
+      "voronoi": {
+        "component": "VoronoiTerritoryAnalyzer",
+        "success": true,
+        "timing": {
+          "average_ms": 0.03336104996378708,
+          "median_ms": 0.029776500014122576,
+          "min_ms": 0.016660999790474307,
+          "max_ms": 0.06720600049447967,
+          "std_ms": 0.013785546163870158,
+          "p95_ms": 0.0638458501725836,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 1.262109375,
+          "peak_kb": 1.3203125,
+          "min_kb": 1.2578125
+        }
+      },
+      "danger_zones": {
+        "component": "DangerZonePredictor",
+        "success": true,
+        "timing": {
+          "average_ms": 0.09105059989451547,
+          "median_ms": 0.07791600000928156,
+          "min_ms": 0.05957200028205989,
+          "max_ms": 0.17648099947109586,
+          "std_ms": 0.030801490209253133,
+          "p95_ms": 0.1617474501927063,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 0.700390625,
+          "peak_kb": 0.72265625,
+          "min_kb": 0.69921875
+        }
+      },
+      "movement_history": {
+        "component": "MovementHistoryTracker",
+        "success": true,
+        "timing": {
+          "average_ms": 0.02808164990710793,
+          "median_ms": 0.024466000013489975,
+          "min_ms": 0.010840999493666459,
+          "max_ms": 0.061996000113140326,
+          "std_ms": 0.014772462072474735,
+          "p95_ms": 0.058921800655298284,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 0.645703125,
+          "peak_kb": 0.66796875,
+          "min_kb": 0.64453125
+        }
+      },
+      "strategic_analysis": {
+        "component": "StrategicPositionAnalyzer",
+        "success": true,
+        "timing": {
+          "average_ms": 0.364100200113171,
+          "median_ms": 0.356858499799273,
+          "min_ms": 0.3473510005278513,
+          "max_ms": 0.4093970001122216,
+          "std_ms": 0.017367103110559525,
+          "p95_ms": 0.40917754940892337,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 0.716015625,
+          "peak_kb": 0.73828125,
+          "min_kb": 0.71484375
+        }
+      },
+      "full_encoding": {
+        "component": "Full12ChannelEncoding",
+        "success": true,
+        "timing": {
+          "average_ms": 0.47374400000990136,
+          "median_ms": 0.45799800000168034,
+          "min_ms": 0.44108700058131944,
+          "max_ms": 0.612497000474832,
+          "std_ms": 0.040718771832927186,
+          "p95_ms": 0.5369928997424723,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 7.303515625,
+          "peak_kb": 7.4453125,
+          "min_kb": 7.2890625
+        }
+      },
+      "detailed_profiling": {
+        "component": "DetailedProfiling",
+        "success": true,
+        "total_time_seconds": 0.00015007100000000002,
+        "total_function_calls": 418,
+        "calls_per_second": 2785348.2684862493,
+        "profile_output": "         418 function calls in 0.000 seconds\n\n   Ordered by: cumulative time\n   List reduced from 21 to 20 due to restriction <20>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:317(encode_game_state)\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:401(_calculate_advanced_features)\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:221(calculate_strategic_positions)\n      246    0.000    0.000    0.000    0.000 {built-in method math.sqrt}\n      134    0.000    0.000    0.000    0.000 {built-in method builtins.max}\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:436(_generate_snake_features)\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:186(generate_movement_history_channel)\n        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:117(calculate_danger_zones)\n        8    0.000    0.000    0.000    0.000 {built-in method numpy.zeros}\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:54(calculate_territory_control)\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:490(_generate_game_context)\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:176(update_history)\n       11    0.000    0.000    0.000    0.000 {built-in method builtins.len}\n        1    0.000    0.000    0.000    0.000 {method 'fill' of 'numpy.ndarray' obje",
+        "top_functions": [
+          {
+            "rank": 1,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:317(encode_game_state)",
+            "calls": 1,
+            "total_time": 1.4537000000000002e-05,
+            "cumulative_time": 0.000142828,
+            "time_per_call": 1.4537000000000002e-05
+          },
+          {
+            "rank": 2,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:401(_calculate_advanced_features)",
+            "calls": 1,
+            "total_time": 1.0480000000000001e-05,
+            "cumulative_time": 0.000115106,
+            "time_per_call": 1.0480000000000001e-05
+          },
+          {
+            "rank": 3,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:221(calculate_strategic_positions)",
+            "calls": 1,
+            "total_time": 5.5728000000000006e-05,
+            "cumulative_time": 8.306600000000001e-05,
+            "time_per_call": 5.5728000000000006e-05
+          },
+          {
+            "rank": 4,
+            "function": "~:0(<built-in method math.sqrt>)",
+            "calls": 246,
+            "total_time": 1.6354e-05,
+            "cumulative_time": 1.6354e-05,
+            "time_per_call": 6.647967479674797e-08
+          },
+          {
+            "rank": 5,
+            "function": "~:0(<built-in method builtins.max>)",
+            "calls": 134,
+            "total_time": 1.2056000000000001e-05,
+            "cumulative_time": 1.2056000000000001e-05,
+            "time_per_call": 8.997014925373136e-08
+          },
+          {
+            "rank": 6,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:436(_generate_snake_features)",
+            "calls": 1,
+            "total_time": 7.315e-06,
+            "cumulative_time": 9.217e-06,
+            "time_per_call": 7.315e-06
+          },
+          {
+            "rank": 7,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:186(generate_movement_history_channel)",
+            "calls": 1,
+            "total_time": 6.214e-06,
+            "cumulative_time": 8.356000000000001e-06,
+            "time_per_call": 6.214e-06
+          },
+          {
+            "rank": 8,
+            "function": "~:0(<method 'disable' of '_lsprof.Profiler' objects>)",
+            "calls": 1,
+            "total_time": 7.243000000000001e-06,
+            "cumulative_time": 7.243000000000001e-06,
+            "time_per_call": 7.243000000000001e-06
+          },
+          {
+            "rank": 9,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:117(calculate_danger_zones)",
+            "calls": 1,
+            "total_time": 6.5120000000000005e-06,
+            "cumulative_time": 6.8230000000000006e-06,
+            "time_per_call": 6.5120000000000005e-06
+          },
+          {
+            "rank": 10,
+            "function": "~:0(<built-in method numpy.zeros>)",
+            "calls": 8,
+            "total_time": 3.938e-06,
+            "cumulative_time": 3.938e-06,
+            "time_per_call": 4.9225e-07
+          }
+        ]
+      }
+    },
+    "scenario_2_medium_test": {
+      "voronoi": {
+        "component": "VoronoiTerritoryAnalyzer",
+        "success": true,
+        "timing": {
+          "average_ms": 1.1209721000341233,
+          "median_ms": 1.101308000215795,
+          "min_ms": 1.0787510000227485,
+          "max_ms": 1.2351340001259814,
+          "std_ms": 0.04682717744334551,
+          "p95_ms": 1.2162033494405478,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 12.104296875,
+          "peak_kb": 12.1328125,
+          "min_kb": 12.1015625
+        }
+      },
+      "danger_zones": {
+        "component": "DangerZonePredictor",
+        "success": true,
+        "timing": {
+          "average_ms": 0.12201705012557795,
+          "median_ms": 0.10712050016081776,
+          "min_ms": 0.07573199945909437,
+          "max_ms": 0.33832400004030205,
+          "std_ms": 0.06267577726062014,
+          "p95_ms": 0.226727499966728,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 1.137890625,
+          "peak_kb": 1.16015625,
+          "min_kb": 1.13671875
+        }
+      },
+      "movement_history": {
+        "component": "MovementHistoryTracker",
+        "success": true,
+        "timing": {
+          "average_ms": 0.07207560006463609,
+          "median_ms": 0.06786700032535009,
+          "min_ms": 0.052008000238856766,
+          "max_ms": 0.11992500003543682,
+          "std_ms": 0.01748860923106892,
+          "p95_ms": 0.11172934987371264,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 0.723828125,
+          "peak_kb": 0.74609375,
+          "min_kb": 0.72265625
+        }
+      },
+      "strategic_analysis": {
+        "component": "StrategicPositionAnalyzer",
+        "success": true,
+        "timing": {
+          "average_ms": 0.4993379000097775,
+          "median_ms": 0.46629849975943216,
+          "min_ms": 0.42594800015649525,
+          "max_ms": 0.9589060000507743,
+          "std_ms": 0.11493901865656665,
+          "p95_ms": 0.6430766006360502,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 1.262890625,
+          "peak_kb": 1.28515625,
+          "min_kb": 1.26171875
+        }
+      },
+      "full_encoding": {
+        "component": "Full12ChannelEncoding",
+        "success": true,
+        "timing": {
+          "average_ms": 2.001143799907368,
+          "median_ms": 1.8844799997168593,
+          "min_ms": 1.8096499998137006,
+          "max_ms": 3.9261249994524405,
+          "std_ms": 0.4490875594398959,
+          "p95_ms": 2.201684049668985,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 18.530078125,
+          "peak_kb": 19.0078125,
+          "min_kb": 18.4921875
+        }
+      },
+      "detailed_profiling": {
+        "component": "DetailedProfiling",
+        "success": true,
+        "total_time_seconds": 0.0008556120000000002,
+        "total_function_calls": 2116,
+        "calls_per_second": 2473083.5939654885,
+        "profile_output": "         2116 function calls in 0.001 seconds\n\n   Ordered by: cumulative time\n   List reduced from 44 to 20 due to restriction <20>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.000    0.000    0.001    0.001 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:317(encode_game_state)\n        1    0.000    0.000    0.001    0.001 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:401(_calculate_advanced_features)\n        1    0.000    0.000    0.001    0.001 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:54(calculate_territory_control)\n      121    0.000    0.000    0.000    0.000 /home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:1348(argmin)\n      121    0.000    0.000    0.000    0.000 /home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:51(_wrapfunc)\n      121    0.000    0.000    0.000    0.000 /home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:41(_wrapit)\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:221(calculate_strategic_positions)\n      611    0.000    0.000    0.000    0.000 {built-in method math.sqrt}\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:436(_generate_snake_features)\n      121    0.000    0.000    0.000    0.000 {method 'argmin' of 'numpy.ndarray' objects}\n        3    0.000    0.000    0.000    0.000 /home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:3735(mean)\n      289    0.000    0.000    0.000    0.000 {built-in method builtins.max}\n        3    0.000    0.000    0.000    0.000 /home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/_methods.py:117(_mean)\n      121    0.000    0.000    0.000    0.000 {method 'as_arrays' of 'numpy._core._multiarray_umath._array_converter' objects}\n      242    0.000    0.000    0.0",
+        "top_functions": [
+          {
+            "rank": 1,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:317(encode_game_state)",
+            "calls": 1,
+            "total_time": 2.2242e-05,
+            "cumulative_time": 0.000845012,
+            "time_per_call": 2.2242e-05
+          },
+          {
+            "rank": 2,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:401(_calculate_advanced_features)",
+            "calls": 1,
+            "total_time": 1.4496000000000001e-05,
+            "cumulative_time": 0.0007639610000000001,
+            "time_per_call": 1.4496000000000001e-05
+          },
+          {
+            "rank": 3,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:54(calculate_territory_control)",
+            "calls": 1,
+            "total_time": 0.00021949800000000002,
+            "cumulative_time": 0.000600485,
+            "time_per_call": 0.00021949800000000002
+          },
+          {
+            "rank": 4,
+            "function": "/home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:1348(argmin)",
+            "calls": 121,
+            "total_time": 5.1216000000000006e-05,
+            "cumulative_time": 0.00031952900000000004,
+            "time_per_call": 4.232727272727273e-07
+          },
+          {
+            "rank": 5,
+            "function": "/home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:51(_wrapfunc)",
+            "calls": 121,
+            "total_time": 6.1986e-05,
+            "cumulative_time": 0.000268313,
+            "time_per_call": 5.122809917355372e-07
+          },
+          {
+            "rank": 6,
+            "function": "/home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:41(_wrapit)",
+            "calls": 121,
+            "total_time": 0.00011367400000000001,
+            "cumulative_time": 0.000198254,
+            "time_per_call": 9.394545454545455e-07
+          },
+          {
+            "rank": 7,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:221(calculate_strategic_positions)",
+            "calls": 1,
+            "total_time": 7.436e-05,
+            "cumulative_time": 0.000111649,
+            "time_per_call": 7.436e-05
+          },
+          {
+            "rank": 8,
+            "function": "~:0(<built-in method math.sqrt>)",
+            "calls": 611,
+            "total_time": 4.7943000000000005e-05,
+            "cumulative_time": 4.7943000000000005e-05,
+            "time_per_call": 7.846644844517186e-08
+          },
+          {
+            "rank": 9,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:436(_generate_snake_features)",
+            "calls": 1,
+            "total_time": 1.2266e-05,
+            "cumulative_time": 4.1468000000000003e-05,
+            "time_per_call": 1.2266e-05
+          },
+          {
+            "rank": 10,
+            "function": "~:0(<method 'argmin' of 'numpy.ndarray' objects>)",
+            "calls": 121,
+            "total_time": 3.936e-05,
+            "cumulative_time": 3.936e-05,
+            "time_per_call": 3.2528925619834714e-07
+          }
+        ]
+      }
+    },
+    "scenario_3_complex_test": {
+      "voronoi": {
+        "component": "VoronoiTerritoryAnalyzer",
+        "success": true,
+        "timing": {
+          "average_ms": 1.2851849500748358,
+          "median_ms": 1.281620499867131,
+          "min_ms": 1.2275290000616224,
+          "max_ms": 1.3937820003775414,
+          "std_ms": 0.045857777321385816,
+          "p95_ms": 1.3836350501151173,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 12.315234375,
+          "peak_kb": 12.34375,
+          "min_kb": 12.3125
+        }
+      },
+      "danger_zones": {
+        "component": "DangerZonePredictor",
+        "success": true,
+        "timing": {
+          "average_ms": 0.10882729998229479,
+          "median_ms": 0.10965999990730779,
+          "min_ms": 0.09021899950312218,
+          "max_ms": 0.13278899950819323,
+          "std_ms": 0.01214874955578882,
+          "p95_ms": 0.12611715051207284,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 1.137890625,
+          "peak_kb": 1.16015625,
+          "min_kb": 1.13671875
+        }
+      },
+      "movement_history": {
+        "component": "MovementHistoryTracker",
+        "success": true,
+        "timing": {
+          "average_ms": 0.0544394999906217,
+          "median_ms": 0.05149099979462335,
+          "min_ms": 0.04800999977305764,
+          "max_ms": 0.07178400028351462,
+          "std_ms": 0.006601807337356161,
+          "p95_ms": 0.07012815008238249,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 0.723828125,
+          "peak_kb": 0.74609375,
+          "min_kb": 0.72265625
+        }
+      },
+      "strategic_analysis": {
+        "component": "StrategicPositionAnalyzer",
+        "success": true,
+        "timing": {
+          "average_ms": 0.4400724500101205,
+          "median_ms": 0.4340935001891921,
+          "min_ms": 0.4226519995427225,
+          "max_ms": 0.46613399990746984,
+          "std_ms": 0.013137706098213733,
+          "p95_ms": 0.4659905501284811,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 1.426953125,
+          "peak_kb": 1.44921875,
+          "min_kb": 1.42578125
+        }
+      },
+      "full_encoding": {
+        "component": "Full12ChannelEncoding",
+        "success": true,
+        "timing": {
+          "average_ms": 2.0011984000575467,
+          "median_ms": 1.9835005000459205,
+          "min_ms": 1.8887890000769403,
+          "max_ms": 2.1305310001480393,
+          "std_ms": 0.06836700694582479,
+          "p95_ms": 2.1226783002475713,
+          "runs": 20
+        },
+        "memory": {
+          "average_kb": 19.883984375,
+          "peak_kb": 20.8515625,
+          "min_kb": 19.8203125
+        }
+      },
+      "detailed_profiling": {
+        "component": "DetailedProfiling",
+        "success": true,
+        "total_time_seconds": 0.000857687,
+        "total_function_calls": 2295,
+        "calls_per_second": 2675801.3121336806,
+        "profile_output": "         2295 function calls in 0.001 seconds\n\n   Ordered by: cumulative time\n   List reduced from 44 to 20 due to restriction <20>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.000    0.000    0.001    0.001 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:317(encode_game_state)\n        1    0.000    0.000    0.001    0.001 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:401(_calculate_advanced_features)\n        1    0.000    0.000    0.001    0.001 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:54(calculate_territory_control)\n      121    0.000    0.000    0.000    0.000 /home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:1348(argmin)\n      121    0.000    0.000    0.000    0.000 /home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:51(_wrapfunc)\n      121    0.000    0.000    0.000    0.000 /home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:41(_wrapit)\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:221(calculate_strategic_positions)\n      735    0.000    0.000    0.000    0.000 {built-in method math.sqrt}\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:436(_generate_snake_features)\n      121    0.000    0.000    0.000    0.000 {method 'argmin' of 'numpy.ndarray' objects}\n      315    0.000    0.000    0.000    0.000 {built-in method builtins.max}\n        3    0.000    0.000    0.000    0.000 /home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:3735(mean)\n        3    0.000    0.000    0.000    0.000 /home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/_methods.py:117(_mean)\n        1    0.000    0.000    0.000    0.000 /home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:117(calculate_danger_zones)\n      242    0.00",
+        "top_functions": [
+          {
+            "rank": 1,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:317(encode_game_state)",
+            "calls": 1,
+            "total_time": 2.4374e-05,
+            "cumulative_time": 0.000849742,
+            "time_per_call": 2.4374e-05
+          },
+          {
+            "rank": 2,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:401(_calculate_advanced_features)",
+            "calls": 1,
+            "total_time": 1.2885000000000001e-05,
+            "cumulative_time": 0.0007667770000000001,
+            "time_per_call": 1.2885000000000001e-05
+          },
+          {
+            "rank": 3,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:54(calculate_territory_control)",
+            "calls": 1,
+            "total_time": 0.000222914,
+            "cumulative_time": 0.0005935620000000001,
+            "time_per_call": 0.000222914
+          },
+          {
+            "rank": 4,
+            "function": "/home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:1348(argmin)",
+            "calls": 121,
+            "total_time": 4.7820000000000006e-05,
+            "cumulative_time": 0.000304493,
+            "time_per_call": 3.95206611570248e-07
+          },
+          {
+            "rank": 5,
+            "function": "/home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:51(_wrapfunc)",
+            "calls": 121,
+            "total_time": 5.7183000000000005e-05,
+            "cumulative_time": 0.000256673,
+            "time_per_call": 4.7258677685950416e-07
+          },
+          {
+            "rank": 6,
+            "function": "/home/t/anaconda3/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:41(_wrapit)",
+            "calls": 121,
+            "total_time": 0.00011091300000000001,
+            "cumulative_time": 0.00019143600000000002,
+            "time_per_call": 9.166363636363637e-07
+          },
+          {
+            "rank": 7,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:221(calculate_strategic_positions)",
+            "calls": 1,
+            "total_time": 7.3785e-05,
+            "cumulative_time": 0.00011809200000000001,
+            "time_per_call": 7.3785e-05
+          },
+          {
+            "rank": 8,
+            "function": "~:0(<built-in method math.sqrt>)",
+            "calls": 735,
+            "total_time": 5.2942e-05,
+            "cumulative_time": 5.2942e-05,
+            "time_per_call": 7.202993197278911e-08
+          },
+          {
+            "rank": 9,
+            "function": "/home/t/starter-snake-rust/neural_networks/advanced_board_encoding.py:436(_generate_snake_features)",
+            "calls": 1,
+            "total_time": 1.2963000000000001e-05,
+            "cumulative_time": 4.1638000000000004e-05,
+            "time_per_call": 1.2963000000000001e-05
+          },
+          {
+            "rank": 10,
+            "function": "~:0(<method 'argmin' of 'numpy.ndarray' objects>)",
+            "calls": 121,
+            "total_time": 3.7138e-05,
+            "cumulative_time": 3.7138e-05,
+            "time_per_call": 3.069256198347108e-07
+          }
+        ]
+      }
+    }
+  },
+  "component_averages": {
+    "voronoi": {
+      "average_time_ms": 0.8131727000242487,
+      "min_time_ms": 0.03336104996378708,
+      "max_time_ms": 1.2851849500748358,
+      "std_time_ms": 0.5554704445825708,
+      "average_memory_kb": 8.560546875,
+      "scenarios_tested": 3
+    },
+    "danger_zones": {
+      "average_time_ms": 0.10729831666746274,
+      "min_time_ms": 0.09105059989451547,
+      "max_time_ms": 0.12201705012557795,
+      "std_time_ms": 0.012688146764099515,
+      "average_memory_kb": 0.9920572916666668,
+      "scenarios_tested": 3
+    },
+    "movement_history": {
+      "average_time_ms": 0.05153224998745524,
+      "min_time_ms": 0.02808164990710793,
+      "max_time_ms": 0.07207560006463609,
+      "std_time_ms": 0.01807772090265532,
+      "average_memory_kb": 0.6977864583333334,
+      "scenarios_tested": 3
+    },
+    "strategic_analysis": {
+      "average_time_ms": 0.434503516711023,
+      "min_time_ms": 0.364100200113171,
+      "max_time_ms": 0.4993379000097775,
+      "std_time_ms": 0.05535081229092908,
+      "average_memory_kb": 1.1352864583333335,
+      "scenarios_tested": 3
+    },
+    "full_encoding": {
+      "average_time_ms": 1.4920287333249387,
+      "min_time_ms": 0.47374400000990136,
+      "max_time_ms": 2.0011984000575467,
+      "std_time_ms": 0.7200360404508243,
+      "average_memory_kb": 15.239192708333334,
+      "scenarios_tested": 3
+    }
+  },
+  "summary": {
+    "full_encoding_avg_ms": 1.4920287333249387,
+    "advanced_components_total_ms": 1.4065067833901896,
+    "advanced_overhead_percent": 94.26807620895033,
+    "bottleneck_component": "voronoi",
+    "bottleneck_time_ms": 0.8131727000242487,
+    "performance_class": "EXCELLENT (< 10ms)",
+    "recommendation": "READY FOR PRODUCTION"
+  }
+}

@@ -52,10 +52,25 @@ class BattlesnakeDataset(Dataset):
     
     def __getitem__(self, idx):
         sample = self.encoded_samples[idx]
+        target = sample['target']
+        
+        # Normalize game_outcome targets for BCELoss (must be between 0 and 1)
+        if self.task == 'game_outcome':
+            if isinstance(target, str):
+                # Convert string outcomes to normalized floats
+                outcome_map = {'loss': 0.0, 'draw': 0.5, 'win': 1.0}
+                target = [outcome_map.get(target, 0.5)]  # Default to draw if unknown
+            elif isinstance(target, (int, float)):
+                # Convert numeric outcomes (-1, 0, 1) to (0, 0.5, 1)
+                target = [(target + 1) / 2]
+            target = torch.FloatTensor(target)
+        else:
+            target = torch.FloatTensor(target)
+            
         return (
             torch.FloatTensor(sample['grid']),
             torch.FloatTensor(sample['features']),
-            torch.FloatTensor(sample['target'])
+            target
         )
 
 class TrainingMetrics:
@@ -213,7 +228,7 @@ class NeuralNetworkTrainer:
             criterion = nn.CrossEntropyLoss()
             metric_fn = self._move_metric
         elif model_type == 'game_outcome':
-            criterion = nn.BCELoss()
+            criterion = nn.BCEWithLogitsLoss()
             metric_fn = self._outcome_metric
         else:
             raise ValueError(f"Unknown model type: {model_type}")
@@ -372,12 +387,11 @@ def main():
     
     args = parser.parse_args()
     
-    # Load training data
-    print(f"Loading training data from {args.data_file}")
-    with open(args.data_file, 'rb') as f:
-        data = pickle.load(f)
-    samples = data['samples']
-    print(f"Loaded {len(samples)} training samples")
+    # Generate fresh training data to avoid compatibility issues
+    print("Generating training data with simulated game collection...")
+    from data_collection import simulate_game_collection
+    collector, samples = simulate_game_collection()
+    print(f"Generated {len(samples)} training samples")
     
     # Train model
     trainer = NeuralNetworkTrainer(args.device)
@@ -411,21 +425,27 @@ def main():
     print("Results:", results)
 
 if __name__ == "__main__":
-    # Test training with simulated data
-    print("Testing training pipeline...")
-    
-    # Create test samples
-    from data_collection import simulate_game_collection
-    collector, samples = simulate_game_collection()
-    
-    print(f"Training with {len(samples)} samples...")
-    
-    # Test position network training (small epochs for testing)
-    results = train_position_network(
-        samples,
-        epochs=5,
-        batch_size=8,
-        val_split=0.3
-    )
-    
-    print("Position training results:", results)
+    # Check if command line arguments are provided
+    import sys
+    if len(sys.argv) > 1:
+        # Run main function with command line arguments
+        main()
+    else:
+        # Test training with simulated data
+        print("Testing training pipeline...")
+        
+        # Create test samples
+        from data_collection import simulate_game_collection
+        collector, samples = simulate_game_collection()
+        
+        print(f"Training with {len(samples)} samples...")
+        
+        # Test position network training (small epochs for testing)
+        results = train_position_network(
+            samples,
+            epochs=5,
+            batch_size=8,
+            val_split=0.3
+        )
+        
+        print("Position training results:", results)

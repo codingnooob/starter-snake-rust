@@ -20,7 +20,7 @@ class ConvBlock(nn.Module):
         super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding=kernel_size//2)
         self.bn = nn.BatchNorm2d(out_channels)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU(inplace=False)
         
     def forward(self, x):
         return self.relu(self.bn(self.conv(x)))
@@ -39,8 +39,8 @@ class ResidualBlock(nn.Module):
         out = self.conv1(x)
         out = self.dropout(out)
         out = self.conv2(out)
-        out += identity  # Skip connection
-        return F.relu(out)
+        out = out + identity  # Skip connection (avoid in-place)
+        return F.relu(out, inplace=False)
 
 class PositionEvaluationNetwork(nn.Module):
     """
@@ -90,10 +90,10 @@ class PositionEvaluationNetwork(nn.Module):
         
         self.feature_mlp = nn.Sequential(
             nn.Linear(total_feature_dim, hidden_dim),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=False),
             nn.Dropout(0.1),
             nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=False),
             nn.Linear(hidden_dim // 2, 1)
         )
         
@@ -180,10 +180,10 @@ class MovePredictionNetwork(nn.Module):
         
         self.feature_mlp = nn.Sequential(
             nn.Linear(total_feature_dim, hidden_dim),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=False),
             nn.Dropout(0.1),
             nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=False),
             nn.Linear(hidden_dim // 2, 4),  # 4 moves
             nn.Softmax(dim=1)  # Ensure probabilities sum to 1
         )
@@ -279,13 +279,13 @@ class GameOutcomeNetwork(nn.Module):
         
         self.feature_mlp = nn.Sequential(
             nn.Linear(total_feature_dim, hidden_dim),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=False),
             nn.Dropout(0.2),
             nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=False),
             nn.Dropout(0.1),
             nn.Linear(hidden_dim // 2, hidden_dim // 4),
-            nn.ReLU(inplace=True),
+            nn.ReLU(inplace=False),
             nn.Linear(hidden_dim // 4, 1),
             nn.Sigmoid()  # Win probability
         )

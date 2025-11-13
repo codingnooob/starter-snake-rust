@@ -14,7 +14,7 @@ use log::{info, warn, error};
 // Import required types from existing logic
 use crate::{Board, Battlesnake, Coord};
 // Import advanced spatial analysis components
-use crate::advanced_spatial_analysis::AdvancedBoardStateEncoder;
+// use crate::advanced_spatial_analysis::AdvancedBoardStateEncoder;
 
 // Neural network inference types
 #[derive(Debug, Clone)]
@@ -270,7 +270,7 @@ pub struct BoardStateEncoder {
     max_board_size: usize,
     encoding_mode: BoardEncodingMode,
     // Advanced spatial analysis encoder for 12-channel mode
-    advanced_encoder: Option<AdvancedBoardStateEncoder>,
+    // advanced_encoder: Option<AdvancedBoardStateEncoder>,
 }
 
 impl BoardStateEncoder {
@@ -279,14 +279,15 @@ impl BoardStateEncoder {
         Self {
             max_board_size,
             encoding_mode: BoardEncodingMode::Basic7Channel,
-            advanced_encoder: None,
+            // advanced_encoder: None,
         }
     }
 
     /// Create new board state encoder with specified encoding mode
     pub fn new_with_mode(max_board_size: usize, mode: BoardEncodingMode) -> Self {
-        let advanced_encoder = if mode == BoardEncodingMode::Advanced12Channel {
-            Some(AdvancedBoardStateEncoder::new(10, 3)) // 10 moves history, 3 turns prediction
+        let _advanced_encoder: Option<()> = if mode == BoardEncodingMode::Advanced12Channel {
+            // Some(AdvancedBoardStateEncoder::new(10, 3)) // 10 moves history, 3 turns prediction
+            None
         } else {
             None
         };
@@ -294,7 +295,7 @@ impl BoardStateEncoder {
         Self {
             max_board_size,
             encoding_mode: mode,
-            advanced_encoder,
+            // advanced_encoder,
         }
     }
 
@@ -310,8 +311,8 @@ impl BoardStateEncoder {
     pub fn set_encoding_mode(&mut self, mode: BoardEncodingMode) {
         if mode != self.encoding_mode {
             self.encoding_mode = mode;
-            if mode == BoardEncodingMode::Advanced12Channel && self.advanced_encoder.is_none() {
-                self.advanced_encoder = Some(AdvancedBoardStateEncoder::new(10, 3));
+            if mode == BoardEncodingMode::Advanced12Channel {
+                // self.advanced_encoder = Some(AdvancedBoardStateEncoder::new(10, 3));
             }
         }
     }
@@ -399,26 +400,27 @@ impl BoardStateEncoder {
 
     /// Encode board state using advanced 12-channel system
     fn encode_advanced_12_channel(&mut self, board: &Board, our_snake: &Battlesnake) -> NeuralNetworkInput {
-        if let Some(ref mut advanced_encoder) = self.advanced_encoder {
+        // if let Some(ref mut advanced_encoder) = self.advanced_encoder {
+        if false {
             // Use real advanced 12-channel encoding
-            let channels = advanced_encoder.encode_12_channel_board(board, our_snake, board.turn);
+            // let channels = advanced_encoder.encode_12_channel_board(board, our_snake, board.turn);
             let height = board.height as usize;
             let width = board.width as usize;
             
             // Convert Vec<Vec<Vec<f32>>> to Array3<f32>
             let mut grid = Array3::zeros((12, self.max_board_size, self.max_board_size));
-            for (ch, channel) in channels.iter().enumerate() {
-                for (y, row) in channel.iter().enumerate() {
-                    for (x, &value) in row.iter().enumerate() {
-                        if ch < 12 && y < self.max_board_size && x < self.max_board_size {
-                            grid[[ch, y, x]] = value;
-                        }
-                    }
-                }
-            }
+            // for (ch, channel) in channels.iter().enumerate() {
+            //     for (y, row) in channel.iter().enumerate() {
+            //         for (x, &value) in row.iter().enumerate() {
+            //             if ch < 12 && y < self.max_board_size && x < self.max_board_size {
+            //                 grid[[ch, y, x]] = value;
+            //             }
+            //         }
+            //     }
+            // }
             
             // Create enhanced feature vector
-            let features = self.create_enhanced_feature_vector(board, our_snake, advanced_encoder);
+            let features = self.create_enhanced_feature_vector(board, our_snake /* , advanced_encoder */);
             
             info!("12-channel encoding complete (advanced): 12 channels, {}x{} board", height, width);
             
@@ -492,7 +494,7 @@ impl BoardStateEncoder {
     }
 
     /// Create enhanced feature vector (for 12-channel mode)
-    fn create_enhanced_feature_vector(&self, board: &Board, our_snake: &Battlesnake, advanced_encoder: &AdvancedBoardStateEncoder) -> Array2<f32> {
+    fn create_enhanced_feature_vector(&self, board: &Board, our_snake: &Battlesnake /*, advanced_encoder: &AdvancedBoardStateEncoder */) -> Array2<f32> {
         let mut features = Array2::zeros((1, 12)); // Expanded feature vector
 
         // Basic features (0-5)

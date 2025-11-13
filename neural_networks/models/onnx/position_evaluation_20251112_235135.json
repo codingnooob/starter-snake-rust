@@ -1,0 +1,16 @@
+{
+  "model_name": "position_evaluation_20251112_235135",
+  "model_type": "position_evaluation",
+  "input_shape": [
+    7,
+    20,
+    20
+  ],
+  "feature_dim": 6,
+  "output_shape": [
+    1
+  ],
+  "exported_at": "2025-11-12T23:51:35.404283",
+  "onnx_version": "1.19.1",
+  "torch_version": "2.8.0+cu128"
+}

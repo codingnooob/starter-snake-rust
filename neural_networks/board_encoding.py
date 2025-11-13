@@ -194,7 +194,15 @@ class TrainingSample:
         elif task == 'position_evaluation':
             return np.array([self.position_score])
         elif task == 'game_outcome':
-            return np.array([self.win_probability])
+            # Handle both numeric win_probability and string game_outcome
+            if self.win_probability is not None:
+                return np.array([self.win_probability])
+            elif self.game_outcome is not None:
+                # Convert string outcomes to normalized floats for BCELoss
+                outcome_map = {'loss': 0.0, 'draw': 0.5, 'win': 1.0}
+                return np.array([outcome_map.get(self.game_outcome, 0.5)])
+            else:
+                return np.array([0.5])  # Default to neutral if no outcome data
         else:
             raise ValueError(f"Unknown training task: {task}")
 
