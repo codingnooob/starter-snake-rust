@@ -12,6 +12,13 @@ use std::env;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 mod logic;
+mod unified_confidence;
+mod neural_confidence_integration;
+mod confidence_validation;
+mod adaptive_neural_system;
+mod enhanced_decision_system;
+
+use enhanced_decision_system::EnhancedDecisionSystem;
 
 // API and Response Objects
 // See https://docs.battlesnake.com/api
@@ -152,6 +159,13 @@ fn rocket() -> _ {
     }
 
     env_logger::init();
+
+    // Initialize the enhanced neural decision system
+    if let Err(e) = EnhancedDecisionSystem::initialize() {
+        info!("Enhanced decision system initialization failed: {}. Falling back to basic decision making.", e);
+    } else {
+        info!("Enhanced neural decision system initialized successfully");
+    }
 
     info!("Starting Battlesnake Server...");
 

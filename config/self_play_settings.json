@@ -1,0 +1,67 @@
+{
+  "servers": [
+    {
+      "port": 8000,
+      "name": "battlesnake-server-8000",
+      "timeout_ms": 500,
+      "max_memory_mb": 256
+    },
+    {
+      "port": 8001,
+      "name": "battlesnake-server-8001",
+      "timeout_ms": 500,
+      "max_memory_mb": 256
+    },
+    {
+      "port": 8002,
+      "name": "battlesnake-server-8002",
+      "timeout_ms": 500,
+      "max_memory_mb": 256
+    },
+    {
+      "port": 8003,
+      "name": "battlesnake-server-8003",
+      "timeout_ms": 500,
+      "max_memory_mb": 256
+    }
+  ],
+  "game": {
+    "board_width": 11,
+    "board_height": 11,
+    "game_mode": "solo",
+    "timeout_ms": 500,
+    "turn_limit": 500,
+    "food_spawn_chance": 15,
+    "minimum_food": 1,
+    "hazard_damage": 0
+  },
+  "data_collection": {
+    "target_games_per_hour": 100,
+    "concurrent_servers": 4,
+    "max_games_per_batch": 25,
+    "board_encoding_channels": 12,
+    "feature_vector_size": 32,
+    "context_vector_size": 16,
+    "data_directory": "data/self_play",
+    "compression_level": 6,
+    "max_file_size_mb": 100,
+    "retention_days": 30,
+    "backup_enabled": true,
+    "min_game_turns": 5,
+    "max_invalid_samples_percent": 10.0,
+    "required_heuristic_components": [
+      "safety",
+      "territory",
+      "opponent",
+      "food",
+      "exploration"
+    ]
+  },
+  "log_level": "INFO",
+  "log_file": "logs/self_play_collection.log",
+  "log_format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+  "health_check_interval_s": 30,
+  "performance_monitoring_enabled": true,
+  "error_retry_attempts": 3,
+  "error_retry_delay_s": 5
+}

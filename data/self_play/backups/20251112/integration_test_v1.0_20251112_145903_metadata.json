@@ -1,0 +1,24 @@
+{
+  "dataset_id": "integration_test",
+  "version": "1.0",
+  "created_at": "2025-11-12T14:59:03.940341",
+  "sample_count": 20,
+  "game_count": 2,
+  "file_size_bytes": 136882,
+  "compression_level": 6,
+  "data_format": "pickle",
+  "description": "Integration test dataset",
+  "tags": [],
+  "avg_game_length": 10.0,
+  "heuristic_score_stats": {
+    "mean": 69.20910337903642,
+    "std": 9.375450336442203,
+    "min": 53.87158115639553,
+    "max": 89.40081327394813
+  },
+  "board_encoding_shape": [
+    11,
+    11,
+    12
+  ]
+}

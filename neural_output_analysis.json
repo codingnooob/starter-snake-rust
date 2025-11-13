@@ -1,0 +1,266 @@
+{
+  "analysis_timestamp": "2025-11-12T22:01:07",
+  "models_analyzed": [
+    "position_evaluation",
+    "move_prediction",
+    "game_outcome"
+  ],
+  "analysis_results": {
+    "position_evaluation": {
+      "model_name": "position_evaluation",
+      "num_samples": 1000,
+      "output_shape": [
+        1000,
+        1,
+        1
+      ],
+      "statistics": {
+        "mean": 0.5271614193916321,
+        "std": 0.0431244857609272,
+        "min": 0.4078952372074127,
+        "max": 0.6528000831604004,
+        "median": 0.5260872840881348
+      },
+      "position_analysis": {
+        "score_distribution": {
+          "mean": 0.5271614193916321,
+          "std": 0.0431244857609272,
+          "min": 0.4078952372074127,
+          "max": 0.6528000831604004,
+          "median": 0.5260872840881348,
+          "q25": 0.49562832713127136,
+          "q75": 0.5568110942840576
+        },
+        "score_categories": {
+          "very_positive": 0,
+          "positive": 1000,
+          "neutral": 0,
+          "negative": 0,
+          "very_negative": 0
+        },
+        "confidence_proxy": {
+          "mean_abs_score": 0.5271614193916321,
+          "extreme_scores": 722,
+          "neutral_scores": 0
+        }
+      },
+      "confidence_analysis": {
+        "deviation_statistics": {
+          "mean_deviation": 0.040447622537612915,
+          "std_deviation": 0.03100735694169998,
+          "max_deviation": 0.1528000831604004,
+          "neutral_point": 0.5
+        },
+        "confidence_distribution": {
+          "high_confidence": 0,
+          "medium_confidence": 0,
+          "low_confidence": 1000
+        }
+      }
+    },
+    "move_prediction": {
+      "model_name": "move_prediction",
+      "num_samples": 1000,
+      "output_shape": [
+        1000,
+        1,
+        4
+      ],
+      "statistics": {
+        "mean": 0.25,
+        "std": 0.04681070148944855,
+        "min": 0.12312001734972,
+        "max": 0.444617360830307,
+        "median": 0.24893078207969666
+      },
+      "move_analysis": {
+        "move_statistics": {
+          "up": {
+            "mean_raw_output": 0.26823386549949646,
+            "std_raw_output": 0.03789903596043587,
+            "min_raw_output": 0.15988406538963318,
+            "max_raw_output": 0.39371195435523987
+          },
+          "down": {
+            "mean_raw_output": 0.2053699642419815,
+            "std_raw_output": 0.032631028443574905,
+            "min_raw_output": 0.12312001734972,
+            "max_raw_output": 0.29953476786613464
+          },
+          "left": {
+            "mean_raw_output": 0.2478465586900711,
+            "std_raw_output": 0.03366569057106972,
+            "min_raw_output": 0.1328401118516922,
+            "max_raw_output": 0.38012757897377014
+          },
+          "right": {
+            "mean_raw_output": 0.2785496413707733,
+            "std_raw_output": 0.04456944763660431,
+            "min_raw_output": 0.16960811614990234,
+            "max_raw_output": 0.444617360830307
+          }
+        },
+        "prediction_certainty": {
+          "mean_max_probability": 0.2646508812904358,
+          "std_max_probability": 0.007518559228628874,
+          "high_certainty_samples": 0,
+          "medium_certainty_samples": 0,
+          "low_certainty_samples": 1000,
+          "uniform_baseline": 0.25
+        },
+        "move_preferences": {
+          "up": 356,
+          "down": 30,
+          "left": 160,
+          "right": 454
+        },
+        "softmax_analysis": {
+          "up": {
+            "mean_probability": 0.25450244545936584,
+            "std_probability": 0.009637347422540188,
+            "min_probability": 0.22813816368579865,
+            "max_probability": 0.28720423579216003
+          },
+          "down": {
+            "mean_probability": 0.23895685374736786,
+            "std_probability": 0.007953238673508167,
+            "min_probability": 0.21867474913597107,
+            "max_probability": 0.26255232095718384
+          },
+          "left": {
+            "mean_probability": 0.2493312656879425,
+            "std_probability": 0.008466139435768127,
+            "min_probability": 0.22157134115695953,
+            "max_probability": 0.2838841378688812
+          },
+          "right": {
+            "mean_probability": 0.2572094202041626,
+            "std_probability": 0.011451071128249168,
+            "min_probability": 0.23008103668689728,
+            "max_probability": 0.3016412854194641
+          }
+        }
+      },
+      "confidence_analysis": {
+        "entropy_statistics": {
+          "mean_entropy": 1.3851916790008545,
+          "std_entropy": 0.0009066961938515306,
+          "mean_normalized_entropy": 0.9992046045714176,
+          "min_entropy": 1.379131555557251,
+          "max_entropy": 1.3862907886505127
+        },
+        "confidence_distribution": {
+          "high_confidence": 0,
+          "medium_confidence": 0,
+          "low_confidence": 1000
+        },
+        "max_probability_stats": {
+          "mean_max_prob": 0.2646508812904358,
+          "std_max_prob": 0.007518559228628874
+        }
+      }
+    },
+    "game_outcome": {
+      "model_name": "game_outcome",
+      "num_samples": 1000,
+      "output_shape": [
+        1000,
+        1,
+        1
+      ],
+      "statistics": {
+        "mean": 0.5360552072525024,
+        "std": 0.042864568531513214,
+        "min": 0.377509206533432,
+        "max": 0.6816239356994629,
+        "median": 0.5365939140319824
+      },
+      "outcome_analysis": {
+        "probability_distribution": {
+          "mean": 0.5360552072525024,
+          "std": 0.042864568531513214,
+          "min": 0.377509206533432,
+          "max": 0.6816239356994629,
+          "median": 0.5365939140319824
+        },
+        "confidence_levels": {
+          "very_confident_win": 0,
+          "confident_win": 63,
+          "uncertain": 934,
+          "confident_loss": 3,
+          "very_confident_loss": 0
+        },
+        "confidence_proxy": {
+          "mean_distance_from_neutral": 0.04569888487458229,
+          "extreme_predictions": 0,
+          "neutral_predictions": 595
+        }
+      },
+      "confidence_analysis": {
+        "deviation_statistics": {
+          "mean_deviation": 0.04569888487458229,
+          "std_deviation": 0.03238769620656967,
+          "max_deviation": 0.1816239356994629,
+          "neutral_point": 0.5
+        },
+        "confidence_distribution": {
+          "high_confidence": 0,
+          "medium_confidence": 0,
+          "low_confidence": 1000
+        }
+      }
+    }
+  },
+  "confidence_insights": {
+    "summary": {
+      "position_evaluation": {
+        "samples_analyzed": 1000,
+        "output_shape": "(1000, 1, 1)",
+        "value_range": "0.408 to 0.653",
+        "mean_output": "0.527 \u00b1 0.043",
+        "confidence_method": "Deviation from neutral",
+        "mean_deviation": "0.040"
+      },
+      "move_prediction": {
+        "samples_analyzed": 1000,
+        "output_shape": "(1000, 1, 4)",
+        "value_range": "0.123 to 0.445",
+        "mean_output": "0.250 \u00b1 0.047",
+        "entropy_method": "Available",
+        "mean_normalized_entropy": "0.999"
+      },
+      "game_outcome": {
+        "samples_analyzed": 1000,
+        "output_shape": "(1000, 1, 1)",
+        "value_range": "0.378 to 0.682",
+        "mean_output": "0.536 \u00b1 0.043",
+        "confidence_method": "Deviation from neutral",
+        "mean_deviation": "0.046"
+      }
+    },
+    "confidence_recommendations": {
+      "entropy_based": {
+        "description": "For multi-output models (move prediction)",
+        "formula": "confidence = 1.0 - (entropy / max_entropy)",
+        "high_threshold": "entropy < 0.3 * max_entropy",
+        "medium_threshold": "0.3 * max_entropy <= entropy < 0.7 * max_entropy",
+        "low_threshold": "entropy >= 0.7 * max_entropy"
+      },
+      "deviation_based": {
+        "description": "For single-output models (position, outcome)",
+        "formula": "confidence = abs(value - neutral_point) / max_possible_deviation",
+        "high_threshold": "deviation > 0.4",
+        "medium_threshold": "0.2 <= deviation <= 0.4",
+        "low_threshold": "deviation < 0.2"
+      },
+      "max_probability_based": {
+        "description": "Alternative for discrete prediction models",
+        "formula": "confidence = max(probabilities)",
+        "high_threshold": "max_prob > 0.8",
+        "medium_threshold": "0.5 < max_prob <= 0.8",
+        "low_threshold": "max_prob <= 0.5"
+      }
+    },
+    "threshold_suggestions": {}
+  }
+}
