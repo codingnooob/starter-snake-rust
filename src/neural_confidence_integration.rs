@@ -3,7 +3,7 @@
 // with the unified system based on actual neural network outputs
 
 use crate::unified_confidence::{UnifiedConfidenceCalculator, NeuralConfidence, ConfidenceLevel};
-use crate::main::{Board, Battlesnake};
+use crate::{Board, Battlesnake};
 use anyhow::{Result, anyhow};
 use ndarray::Array2;
 use log::{info, warn, debug, error};
@@ -125,6 +125,7 @@ impl EnhancedNeuralEvaluator {
         &self,
         board: &Board,
         our_snake: &Battlesnake,
+        turn: i32,
         safe_moves: &[String],
         neural_outputs: &NeuralNetworkOutputs,
     ) -> Result<NeuralDecisionResult> {
@@ -158,7 +159,8 @@ impl EnhancedNeuralEvaluator {
 
         // 2. Calculate multi-model consistency
         let consistency_score = if let Some(ref move_probs) = neural_outputs.move_probabilities {
-            let move_probs_slice = move_probs.row(0).as_slice().unwrap();
+            let move_probs_row = move_probs.row(0);
+            let move_probs_slice = move_probs_row.as_slice().unwrap();
             self.confidence_calculator.read().calculate_consistency_confidence(
                 neural_outputs.position_score.unwrap_or(0.5),
                 move_probs_slice,
@@ -186,7 +188,7 @@ impl EnhancedNeuralEvaluator {
         )?;
 
         // 5. Record decision for learning and analysis
-        self.record_decision(&decision_result, board, our_snake, &unified_confidence);
+        self.record_decision(&decision_result, board, our_snake, &unified_confidence, turn);
 
         // 6. Update metrics
         self.update_metrics(&mut metrics, &unified_confidence, &decision_result);
@@ -263,7 +265,8 @@ impl EnhancedNeuralEvaluator {
         // Get move probabilities
         let move_probs = neural_outputs.move_probabilities.as_ref()
             .ok_or_else(|| anyhow!("No move probabilities available"))?;
-        let probs_slice = move_probs.row(0).as_slice().unwrap();
+        let probs_row = move_probs.row(0);
+        let probs_slice = probs_row.as_slice().unwrap();
 
         // Create move evaluations
         let mut move_evaluations: Vec<MoveEvaluation> = move_names.iter()
@@ -392,6 +395,7 @@ impl EnhancedNeuralEvaluator {
         board: &Board,
         our_snake: &Battlesnake,
         confidence: &NeuralConfidence,
+        turn: i32,
     ) {
         let record = NeuralDecisionRecord {
             timestamp: chrono::Utc::now().to_rfc3339(),
@@ -400,12 +404,12 @@ impl EnhancedNeuralEvaluator {
             alternative_moves: decision.all_move_evaluations.iter()
                 .map(|eval| eval.move_name.clone())
                 .collect(),
-            board_hash: self.calculate_board_hash(board),
+            board_hash: self.calculate_board_hash(board, turn as u32),
             game_context: GameContextSnapshot {
                 our_health: our_snake.health,
                 our_length: our_snake.body.len(),
-                turn_number: board.turn,
-                num_opponents: board.snakes.len() - 1, // Exclude ourselves
+                turn_number: turn,
+                num_opponents: board.snakes.len().saturating_sub(1), // Exclude ourselves, handle empty board
                 food_available: board.food.len(),
                 board_size: (board.width, board.height),
             },
@@ -451,7 +455,7 @@ impl EnhancedNeuralEvaluator {
     }
 
     /// Calculate a simple hash of the board state for tracking
-    fn calculate_board_hash(&self, board: &Board) -> u64 {
+    fn calculate_board_hash(&self, board: &Board, turn: u32) -> u64 {
         use std::collections::hash_map::DefaultHasher;
         use std::hash::{Hash, Hasher};
 
@@ -460,7 +464,7 @@ impl EnhancedNeuralEvaluator {
         // Hash key board features
         board.width.hash(&mut hasher);
         board.height.hash(&mut hasher);
-        board.turn.hash(&mut hasher);
+        turn.hash(&mut hasher);
         
         // Hash food positions
         for food in &board.food {
@@ -539,7 +543,7 @@ pub struct NeuralNetworkOutputs {
 mod tests {
     use super::*;
     use ndarray::array;
-    use crate::main::{Board, Battlesnake, Coord};
+    use crate::types::{Board, Battlesnake, Coord};
 
     fn create_test_board() -> Board {
         Board {
@@ -547,6 +551,7 @@ mod tests {
             width: 11,
             food: vec![Coord { x: 5, y: 5 }],
             snakes: vec![],
+            hazards: vec![], // Add missing hazards field
             turn: 10,
         }
     }
@@ -578,7 +583,7 @@ mod tests {
             win_probability: Some(0.54), // Close to neutral
         };
 
-        let result = evaluator.make_neural_decision(&board, &snake, &safe_moves, &neural_outputs).unwrap();
+        let result = evaluator.make_neural_decision(&board, &snake, 10, &safe_moves, &neural_outputs).unwrap();
 
         // Should fallback to heuristics due to low confidence
         assert!(matches!(result.decision_source, DecisionSource::HeuristicFallback(_)));
@@ -599,7 +604,7 @@ mod tests {
             win_probability: Some(0.80), // High confidence
         };
 
-        let result = evaluator.make_neural_decision(&board, &snake, &safe_moves, &neural_outputs).unwrap();
+        let result = evaluator.make_neural_decision(&board, &snake, 10, &safe_moves, &neural_outputs).unwrap();
 
         // Should override unsafe neural choice
         assert!(matches!(result.decision_source, DecisionSource::SafetyOverride(_)));
@@ -621,7 +626,7 @@ mod tests {
             win_probability: Some(0.80), // High confidence
         };
 
-        let result = evaluator.make_neural_decision(&board, &snake, &safe_moves, &neural_outputs).unwrap();
+        let result = evaluator.make_neural_decision(&board, &snake, 10, &safe_moves, &neural_outputs).unwrap();
 
         // Should use neural network choice
         assert!(matches!(result.decision_source, DecisionSource::NeuralNetworkHighConfidence));

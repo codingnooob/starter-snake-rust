@@ -3,7 +3,7 @@
 
 use starter_snake_rust::unified_confidence::*;
 use starter_snake_rust::neural_confidence_integration::*;
-use starter_snake_rust::main::{Board, Battlesnake, Coord};
+use starter_snake_rust::{Board, Battlesnake, Coord};
 use ndarray::array;
 use anyhow::Result;
 
@@ -243,15 +243,16 @@ mod integration_tests {
     use super::*;
 
     /// Test the complete decision-making pipeline
-    mod decision_pipeline {
+    pub mod decision_pipeline {
         use super::*;
 
-        fn create_test_scenario() -> (Board, Battlesnake, Vec<String>) {
+        pub fn create_test_scenario() -> (Board, Battlesnake, Vec<String>) {
             let board = Board {
                 height: 11,
                 width: 11,
                 food: vec![Coord { x: 5, y: 5 }],
                 snakes: vec![],
+                hazards: vec![],
                 turn: 10,
             };
             
@@ -274,7 +275,7 @@ mod integration_tests {
         #[test]
         fn test_complete_decision_pipeline_low_confidence() {
             let evaluator = EnhancedNeuralEvaluator::new();
-            let (board, snake, safe_moves) = create_test_scenario();
+            let (board, snake, safe_moves) = integration_tests::decision_pipeline::create_test_scenario();
             
             // Low confidence neural outputs (realistic current model behavior)
             let neural_outputs = NeuralNetworkOutputs {
@@ -283,7 +284,7 @@ mod integration_tests {
                 win_probability: Some(0.54), // Close to neutral
             };
 
-            let result = evaluator.make_neural_decision(&board, &snake, &safe_moves, &neural_outputs).unwrap();
+            let result = evaluator.make_neural_decision(&board, &snake, 10, &safe_moves, &neural_outputs).unwrap();
 
             // Should fallback to heuristics
             assert!(matches!(result.decision_source, DecisionSource::HeuristicFallback(_)));
@@ -294,7 +295,7 @@ mod integration_tests {
         #[test]
         fn test_complete_decision_pipeline_high_confidence_safe() {
             let evaluator = EnhancedNeuralEvaluator::new();
-            let (board, snake, safe_moves) = create_test_scenario();
+            let (board, snake, safe_moves) = integration_tests::decision_pipeline::create_test_scenario();
             
             // High confidence neural outputs with safe choice
             let neural_outputs = NeuralNetworkOutputs {
@@ -303,7 +304,7 @@ mod integration_tests {
                 win_probability: Some(0.80), // High confidence
             };
 
-            let result = evaluator.make_neural_decision(&board, &snake, &safe_moves, &neural_outputs).unwrap();
+            let result = evaluator.make_neural_decision(&board, &snake, 10, &safe_moves, &neural_outputs).unwrap();
 
             // Should use neural network choice
             assert!(matches!(result.decision_source, DecisionSource::NeuralNetworkHighConfidence));
@@ -315,7 +316,7 @@ mod integration_tests {
         #[test]
         fn test_safety_override_with_high_confidence() {
             let evaluator = EnhancedNeuralEvaluator::new();
-            let (board, snake, safe_moves) = create_test_scenario();
+            let (board, snake, safe_moves) = integration_tests::decision_pipeline::create_test_scenario();
             
             // High confidence neural outputs but preferring unsafe move
             let neural_outputs = NeuralNetworkOutputs {
@@ -324,7 +325,7 @@ mod integration_tests {
                 win_probability: Some(0.80), // High confidence
             };
 
-            let result = evaluator.make_neural_decision(&board, &snake, &safe_moves, &neural_outputs).unwrap();
+            let result = evaluator.make_neural_decision(&board, &snake, 10, &safe_moves, &neural_outputs).unwrap();
 
             // Should override with safety
             assert!(matches!(result.decision_source, DecisionSource::SafetyOverride(_)));
@@ -335,7 +336,7 @@ mod integration_tests {
         #[test]
         fn test_missing_neural_outputs_graceful_handling() {
             let evaluator = EnhancedNeuralEvaluator::new();
-            let (board, snake, safe_moves) = create_test_scenario();
+            let (board, snake, safe_moves) = integration_tests::decision_pipeline::create_test_scenario();
             
             // Missing position score
             let neural_outputs = NeuralNetworkOutputs {
@@ -344,7 +345,7 @@ mod integration_tests {
                 win_probability: Some(0.80),
             };
 
-            let result = evaluator.make_neural_decision(&board, &snake, &safe_moves, &neural_outputs).unwrap();
+            let result = evaluator.make_neural_decision(&board, &snake, 10, &safe_moves, &neural_outputs).unwrap();
 
             // Should handle gracefully and fallback
             assert!(matches!(result.decision_source, DecisionSource::HeuristicFallback(_)));
@@ -363,7 +364,7 @@ mod integration_tests {
                 win_probability: Some(0.80),
             };
 
-            let result = evaluator.make_neural_decision(&board, &snake, &empty_safe_moves, &neural_outputs);
+            let result = evaluator.make_neural_decision(&board, &snake, 10, &empty_safe_moves, &neural_outputs);
 
             // Should return error when no safe moves available
             assert!(result.is_err());
@@ -377,7 +378,7 @@ mod integration_tests {
         #[test]
         fn test_metrics_collection() {
             let evaluator = EnhancedNeuralEvaluator::new();
-            let (board, snake, safe_moves) = create_test_scenario();
+            let (board, snake, safe_moves) = integration_tests::decision_pipeline::create_test_scenario();
             
             // Make several decisions to test metrics
             for i in 0..5 {
@@ -393,7 +394,7 @@ mod integration_tests {
                     win_probability: Some(confidence_level),
                 };
 
-                let _ = evaluator.make_neural_decision(&board, &snake, &safe_moves, &neural_outputs).unwrap();
+                let _ = evaluator.make_neural_decision(&board, &snake, 10, &safe_moves, &neural_outputs).unwrap();
             }
 
             let metrics = evaluator.get_metrics();
@@ -406,7 +407,7 @@ mod integration_tests {
         #[test]
         fn test_decision_history_tracking() {
             let evaluator = EnhancedNeuralEvaluator::new();
-            let (board, snake, safe_moves) = create_test_scenario();
+            let (board, snake, safe_moves) = integration_tests::decision_pipeline::create_test_scenario();
             
             let neural_outputs = NeuralNetworkOutputs {
                 position_score: Some(0.85),
@@ -414,7 +415,7 @@ mod integration_tests {
                 win_probability: Some(0.80),
             };
 
-            let _ = evaluator.make_neural_decision(&board, &snake, &safe_moves, &neural_outputs).unwrap();
+            let _ = evaluator.make_neural_decision(&board, &snake, 10, &safe_moves, &neural_outputs).unwrap();
             
             let recent_decisions = evaluator.get_recent_decisions(10);
             assert_eq!(recent_decisions.len(), 1);
@@ -428,7 +429,7 @@ mod integration_tests {
         #[test]
         fn test_analysis_data_export() {
             let evaluator = EnhancedNeuralEvaluator::new();
-            let (board, snake, safe_moves) = create_test_scenario();
+            let (board, snake, safe_moves) = integration_tests::decision_pipeline::create_test_scenario();
             
             let neural_outputs = NeuralNetworkOutputs {
                 position_score: Some(0.85),
@@ -436,7 +437,7 @@ mod integration_tests {
                 win_probability: Some(0.80),
             };
 
-            let _ = evaluator.make_neural_decision(&board, &snake, &safe_moves, &neural_outputs).unwrap();
+            let _ = evaluator.make_neural_decision(&board, &snake, 10, &safe_moves, &neural_outputs).unwrap();
             
             let analysis_data = evaluator.export_analysis_data().unwrap();
             assert!(analysis_data.contains("total_decisions"));
@@ -458,7 +459,7 @@ mod stress_tests {
     #[test]
     fn test_high_volume_decision_making() {
         let evaluator = EnhancedNeuralEvaluator::new();
-        let (board, snake, safe_moves) = create_test_scenario();
+        let (board, snake, safe_moves) = integration_tests::decision_pipeline::create_test_scenario();
         
         // Make 1000 decisions to test performance and memory usage
         for i in 0..1000 {
@@ -475,7 +476,7 @@ mod stress_tests {
                 win_probability: Some(0.5 + confidence_val * 0.3),
             };
 
-            let result = evaluator.make_neural_decision(&board, &snake, &safe_moves, &neural_outputs);
+            let result = evaluator.make_neural_decision(&board, &snake, 10, &safe_moves, &neural_outputs);
             assert!(result.is_ok());
         }
 
@@ -493,7 +494,7 @@ mod stress_tests {
         use std::thread;
         
         let evaluator = Arc::new(EnhancedNeuralEvaluator::new());
-        let (board, snake, safe_moves) = create_test_scenario();
+        let (board, snake, safe_moves) = integration_tests::decision_pipeline::create_test_scenario();
         
         let mut handles = vec![];
         
@@ -515,6 +516,7 @@ mod stress_tests {
                     let result = evaluator_clone.make_neural_decision(
                         &board_clone, 
                         &snake_clone, 
+                        10,
                         &safe_moves_clone, 
                         &neural_outputs
                     );
@@ -539,6 +541,7 @@ mod stress_tests {
             width: 11,
             food: vec![Coord { x: 5, y: 5 }],
             snakes: vec![],
+            hazards: vec![],
             turn: 10,
         };
         

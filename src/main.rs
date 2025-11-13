@@ -7,63 +7,25 @@ use rocket::http::Status;
 use rocket::serde::{json::Json, Deserialize};
 use serde::Serialize;
 use serde_json::Value;
-use std::collections::HashMap;
 use std::env;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 mod logic;
+mod neural_network;
+// TODO: Fix syntax errors - temporarily disabled
+// pub mod advanced_spatial_analysis;
+// #[cfg(test)]
+// mod spatial_test_utilities;
+mod test_json;
 mod unified_confidence;
 mod neural_confidence_integration;
 mod confidence_validation;
 mod adaptive_neural_system;
 mod enhanced_decision_system;
+mod types;
 
 use enhanced_decision_system::EnhancedDecisionSystem;
-
-// API and Response Objects
-// See https://docs.battlesnake.com/api
-
-#[derive(Deserialize, Serialize, Debug)]
-pub struct Game {
-    id: String,
-    ruleset: HashMap<String, Value>,
-    timeout: u32,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-pub struct Board {
-    height: u32,
-    width: i32,
-    food: Vec<Coord>,
-    snakes: Vec<Battlesnake>,
-    hazards: Vec<Coord>,
-}
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct Battlesnake {
-    pub id: String,
-    pub name: String,
-    pub health: i32,
-    pub body: Vec<Coord>,
-    pub head: Coord,
-    pub length: i32,
-    pub latency: String,
-    pub shout: Option<String>,
-}
-
-#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Coord {
-    pub x: i32,
-    pub y: i32,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-pub struct GameState {
-    game: Game,
-    turn: i32,
-    board: Board,
-    you: Battlesnake,
-}
+use types::{Board, Battlesnake, Coord, Game, GameState};
 
 #[get("/")]
 fn handle_index() -> Json<Value> {

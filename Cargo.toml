@@ -4,6 +4,10 @@ name = "starter-snake-rust"
 version = "1.0.0"
 edition = "2018"
 
+[lib]
+name = "starter_snake_rust"
+path = "src/lib.rs"
+
 homepage = "https://play.battlesnake.com"
 repository = "https://github.com/BattlesnakeOfficial/starter-snake-rust/"
 
@@ -28,3 +32,12 @@ anyhow = "1.0"
 thiserror = "1.0"
 parking_lot = "0.12"
 lazy_static = "1.4"
+chrono = { version = "0.4", features = ["serde"] }
+
+[dev-dependencies]
+# Performance benchmarking
+criterion = { version = "0.5", features = ["html_reports"] }
+# Property-based testing and fuzzing
+proptest = "1.4"
+quickcheck = "1.0"
+quickcheck_macros = "1.0"

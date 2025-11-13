@@ -1,0 +1,72 @@
+{
+  "game": {
+    "id": "test-game",
+    "timeout": 500
+  },
+  "turn": 10,
+  "board": {
+    "height": 11,
+    "width": 11,
+    "food": [
+      {
+        "x": 5,
+        "y": 5
+      }
+    ],
+    "hazards": [],
+    "snakes": [
+      {
+        "id": "test-snake-1",
+        "name": "Test Snake",
+        "health": 85,
+        "body": [
+          {
+            "x": 3,
+            "y": 3
+          },
+          {
+            "x": 3,
+            "y": 4
+          },
+          {
+            "x": 3,
+            "y": 5
+          }
+        ],
+        "head": {
+          "x": 3,
+          "y": 3
+        },
+        "length": 3,
+        "latency": "50",
+        "shout": ""
+      }
+    ]
+  },
+  "you": {
+    "id": "test-snake-1",
+    "name": "Test Snake",
+    "health": 85,
+    "body": [
+      {
+        "x": 3,
+        "y": 3
+      },
+      {
+        "x": 3,
+        "y": 4
+      },
+      {
+        "x": 3,
+        "y": 5
+      }
+    ],
+    "head": {
+      "x": 3,
+      "y": 3
+    },
+    "length": 3,
+    "latency": "50",
+    "shout": ""
+  }
+}

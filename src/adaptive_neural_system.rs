@@ -2,14 +2,16 @@
 // Creates a self-improving neural network confidence system
 
 use crate::unified_confidence::{ConfidenceConfig, UnifiedConfidenceCalculator};
-use crate::neural_confidence_integration::{EnhancedNeuralEvaluator, NeuralDecisionRecord, DecisionOutcome};
+use crate::neural_confidence_integration::{EnhancedNeuralEvaluator, NeuralDecisionRecord, NeuralDecisionResult, NeuralNetworkOutputs, DecisionOutcome, GameContextSnapshot};
 use crate::confidence_validation::{ConfidenceValidator, ValidationRecord, GameValidationContext};
-use crate::main::{Board, Battlesnake, Coord};
+use crate::neural_network::{ONNXInferenceEngine, BoardStateEncoder, NeuralNetworkType, NeuralNetworkInput, NeuralNetworkOutput};
+use crate::{Board, Battlesnake, Coord};
 use anyhow::{Result, anyhow};
 use serde::{Serialize, Deserialize};
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
 use log::{info, warn, debug, error};
+use ndarray;
 
 /// Adaptive neural system that learns and optimizes over time
 pub struct AdaptiveNeuralSystem {
@@ -33,7 +35,7 @@ pub struct AdaptiveNeuralSystem {
 }
 
 /// Tracks the current adaptation and learning state
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AdaptationState {
     pub total_decisions_made: u64,
     pub successful_decisions: u64,
@@ -45,7 +47,7 @@ pub struct AdaptationState {
     pub confidence_accuracy_trend: f32,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum PerformanceTrend {
     Improving,
     Stable,
@@ -79,6 +81,7 @@ pub struct OptimizationScheduler {
     pub last_optimization_decision_count: u64,
     pub optimization_in_progress: bool,
     pub scheduled_optimization_types: Vec<OptimizationType>,
+    pub optimization_cycle_count: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -124,7 +127,7 @@ pub struct OptimizationResult {
 impl AdaptiveNeuralSystem {
     pub fn new() -> Result<Self> {
         let config = ConfidenceConfig::default();
-        let neural_evaluator = EnhancedNeuralEvaluator::new(config.clone())?;
+        let neural_evaluator = EnhancedNeuralEvaluator::new();
         let validator = ConfidenceValidator::new();
         
         Ok(Self {
@@ -152,6 +155,7 @@ impl AdaptiveNeuralSystem {
                     OptimizationType::ThresholdCalibration,
                     OptimizationType::ConfidenceWeightAdjustment,
                 ],
+                optimization_cycle_count: 0,
             },
         })
     }
@@ -174,10 +178,41 @@ impl AdaptiveNeuralSystem {
             }
         }
 
-        // Make the enhanced decision using current configuration
-        let decision_record = {
+        // Generate neural network outputs first
+        let neural_engine = ONNXInferenceEngine::new();
+        let mut encoder = BoardStateEncoder::new(30); // max_board_size = 30
+        let encoded_input = encoder.encode_board_state(board, you);
+        let neural_output = neural_engine.run_inference(&NeuralNetworkType::MovePrediction, &encoded_input)?;
+        
+        // Convert single NeuralNetworkOutput to NeuralNetworkOutputs structure
+        let neural_outputs = NeuralNetworkOutputs {
+            position_score: neural_output.position_score,
+            move_probabilities: neural_output.move_probabilities.clone(),
+            win_probability: neural_output.win_probability,
+        };
+
+        // Make the neural decision using current configuration
+        let neural_decision_result = {
             let mut evaluator = self.neural_evaluator.lock().unwrap();
-            evaluator.make_enhanced_decision(board, you, turn, safe_moves)?
+            evaluator.make_neural_decision(board, you, turn, safe_moves, &neural_outputs)?
+        };
+
+        // Create NeuralDecisionRecord with all required fields
+        let decision_record = NeuralDecisionRecord {
+            chosen_move: safe_moves[0].clone(), // Use first safe move as placeholder
+            confidence: neural_decision_result.confidence,
+            timestamp: chrono::Utc::now().to_rfc3339(),
+            alternative_moves: safe_moves[1..].to_vec(), // Other safe moves as alternatives
+            board_hash: 12345u64, // Placeholder board hash
+            game_context: GameContextSnapshot {
+                our_health: you.health,
+                our_length: you.body.len(),
+                turn_number: turn,
+                num_opponents: board.snakes.len() - 1, // All snakes minus us
+                food_available: board.food.len(),
+                board_size: (board.width, board.height),
+            },
+            decision_outcome: None, // Filled in retrospectively
         };
 
         // Record the decision for validation
@@ -205,13 +240,16 @@ impl AdaptiveNeuralSystem {
     ) -> Result<()> {
         debug!("Recording decision outcome for {}: {:?}", decision_id, outcome);
         
+        // Calculate performance impact before mutable borrow
+        let performance_impact = self.outcome_to_performance_impact(&outcome);
+        
         // Find the decision in our history
         if let Some(historical_decision) = self.decision_history.iter_mut()
             .find(|d| d.decision_record.timestamp.contains(decision_id)) {
             
             historical_decision.final_outcome = Some(outcome.clone());
             historical_decision.outcome_timestamp = Some(chrono::Utc::now().to_rfc3339());
-            historical_decision.performance_impact = self.outcome_to_performance_impact(&outcome);
+            historical_decision.performance_impact = performance_impact;
             
             // Update success/failure counters
             match outcome {
@@ -290,7 +328,7 @@ impl AdaptiveNeuralSystem {
         let confidence_accuracy = {
             let validator = self.validator.lock().unwrap();
             // Get overall correlation if available
-            validator.outcome_correlations.get("overall")
+            validator.get_outcome_correlations().get("overall")
                 .map(|corr| corr.confidence_outcome_correlation)
                 .unwrap_or(0.0)
         };
@@ -475,7 +513,7 @@ impl AdaptiveNeuralSystem {
         {
             let mut evaluator = self.neural_evaluator.lock().unwrap();
             let config = self.config.lock().unwrap();
-            evaluator.update_configuration(config.clone())?;
+            evaluator.update_confidence_config(config.clone());
         }
         
         Ok(OptimizationResult {
@@ -493,7 +531,7 @@ impl AdaptiveNeuralSystem {
         // Analyze which confidence components correlate best with outcomes
         let validator = self.validator.lock().unwrap();
         
-        if let Some(correlation) = validator.outcome_correlations.get("overall") {
+        if let Some(correlation) = validator.get_outcome_correlations().get("overall") {
             let mut config = self.config.lock().unwrap();
             
             // Adjust weights based on correlation strength

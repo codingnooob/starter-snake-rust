@@ -1,10 +1,10 @@
-use log::info;
+use log::{info, debug, warn};
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::time::Instant;
 
-use crate::{Battlesnake, Board, Coord, Game};
+use crate::types::{Battlesnake, Board, Coord, Game};
 
 // Battlesnake Info
 // This function is called when you register your Battlesnake on play.battlesnake.com
@@ -1073,11 +1073,11 @@ impl HybridDecisionMaker {
 // Game State Simulation Engine for Multi-ply Lookahead with Opponent Modeling Support
 #[derive(Debug, Clone)]
 pub struct SimulatedGameState {
+    pub turn: i32,
     pub board_width: i32,
     pub board_height: u32,
     pub food: Vec<Coord>,
     pub snakes: Vec<SimulatedSnake>,
-    pub turn: i32,
 }
 
 #[derive(Debug, Clone)]
@@ -1411,11 +1411,12 @@ impl GameSimulator {
             .collect();
         
         SimulatedGameState {
+            turn: 0,
             board_width: _board.width,
             board_height: _board.height,
             food: _board.food.clone(),
             snakes: simulated_snakes,
-            turn: 0,
+            
         }
     }
     
@@ -1476,6 +1477,8 @@ impl IntegratedEvaluator {
                 .map(|sim_snake| self.to_api_snake(sim_snake))
                 .collect(),
             hazards: Vec::new(),
+            turn: 0, // Default turn for simulated states
+            
         }
     }
     
@@ -3352,6 +3355,8 @@ impl TerritorialFallbackMaker {
             snakes: state.snakes.iter()
                 .map(|s| self.convert_simulated_to_battlesnake(s))
                 .collect(),
+            turn: 0, // Default turn for simulated states
+            
         }
     }
     
@@ -3418,6 +3423,7 @@ mod tests {
                 },
             ],
             hazards: Vec::new(),
+            turn: 0, // Default turn for test board
         }
     }
 
@@ -3822,6 +3828,7 @@ mod tests {
     // Create a simplified test state for minimax testing
     fn create_minimax_test_state() -> SimulatedGameState {
         SimulatedGameState {
+            turn: 0,
             board_width: 7,
             board_height: 7,
             food: vec![Coord { x: 3, y: 3 }],
@@ -3847,7 +3854,6 @@ mod tests {
                     is_alive: true,
                 },
             ],
-            turn: 1,
         }
     }
 

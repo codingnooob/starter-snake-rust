@@ -168,7 +168,7 @@ impl UnifiedConfidenceCalculator {
         let entropy_confidence = 1.0 - normalized_entropy; // Higher entropy = lower confidence
         
         // 2. Calculate max probability confidence
-        let max_prob = probs_slice.iter().fold(0.0, |a, &b| a.max(b));
+        let max_prob = probs_slice.iter().fold(0.0f32, |a: f32, &b| a.max(b));
         let prob_confidence = if max_prob > self.config.move_prediction_thresholds.random_baseline {
             (max_prob - self.config.move_prediction_thresholds.random_baseline) / 
             (1.0 - self.config.move_prediction_thresholds.random_baseline)
@@ -290,14 +290,23 @@ impl UnifiedConfidenceCalculator {
         outcome_prob: f32,
     ) -> f32 {
         // Check if models agree: positive position should correlate with high win probability
-        let position_outcome_consistency = {
-            let pos_normalized = position_score - 0.5; // Center around 0
-            let outcome_normalized = outcome_prob - 0.5;
-            let correlation = pos_normalized * outcome_normalized;
-            (correlation + 0.25) / 0.5 // Normalize to [0,1]
+        let pos_normalized = position_score - 0.5; // Center around 0
+        let outcome_normalized = outcome_prob - 0.5;
+        let correlation = pos_normalized * outcome_normalized;
+        
+        // Strong disagreement should result in very low consistency
+        let position_outcome_consistency = if correlation < -0.1 {
+            // Strong negative correlation = highly inconsistent
+            0.0
+        } else if correlation > 0.1 {
+            // Strong positive correlation = highly consistent
+            1.0
+        } else {
+            // Weak correlation = moderate consistency
+            0.5
         };
         
-        // Check if strongest move aligns with positive position evaluation
+        // Check if strongest move aligns with position and outcome
         let max_move_idx = move_probs.iter()
             .enumerate()
             .max_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap())
@@ -307,21 +316,36 @@ impl UnifiedConfidenceCalculator {
         let max_move_prob = move_probs[max_move_idx];
         let move_strength = (max_move_prob - 0.25) * 4.0; // Normalize move confidence
         let position_strength = (position_score - 0.5) * 2.0; // Normalize position
+        let outcome_strength = (outcome_prob - 0.5) * 2.0; // Normalize outcome
         
-        let move_position_consistency = if move_strength > 0.1 && position_strength > 0.1 {
-            0.8 // Strong move + good position = consistent
-        } else if move_strength < -0.1 && position_strength < -0.1 {
-            0.8 // Weak move + bad position = consistent
+        // All three should agree for high consistency
+        let signs_agree = (position_strength > 0.0) == (outcome_strength > 0.0) && 
+                         (move_strength > 0.1) == (position_strength > 0.0);
+        
+        let move_consistency = if signs_agree && move_strength.abs() > 0.1 {
+            0.8 // All models agree on direction
+        } else if !signs_agree {
+            0.2 // Models disagree on direction = inconsistent
         } else {
-            0.4 // Mixed signals
+            0.5 // Neutral/mixed signals
         };
         
-        (position_outcome_consistency + move_position_consistency) / 2.0
+        let combined_consistency: f32 = (position_outcome_consistency + move_consistency) / 2.0;
+        
+        // Ensure consistency is properly bounded and handles negative correlations
+        combined_consistency.max(0.0).min(1.0)
     }
     
     // Private helper methods
     
     fn calculate_entropy(&self, probabilities: &[f32]) -> f32 {
+        // Handle edge case: all zeros should have maximum entropy (minimum confidence)
+        let non_zero_count = probabilities.iter().filter(|&&p| p > 0.0).count();
+        if non_zero_count == 0 {
+            // All zeros = maximum uncertainty = maximum entropy
+            return (probabilities.len() as f32).ln();
+        }
+        
         -probabilities.iter()
             .filter(|&&p| p > 0.0)
             .map(|&p| p * p.ln())
@@ -404,7 +428,7 @@ impl UnifiedConfidenceCalculator {
     }
     
     /// Update configuration with empirical data
-    pub fn update_thresholds_from_analysis(&mut self, analysis_data: &str) -> Result<()> {
+    pub fn update_thresholds_from_analysis(&mut self, _analysis_data: &str) -> Result<()> {
         // This would parse the neural_output_analysis.json and adjust thresholds
         // based on actual model performance
         info!("Updating confidence thresholds based on empirical analysis");

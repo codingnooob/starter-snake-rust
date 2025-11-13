@@ -4,7 +4,7 @@
 // This module integrates neural network predictions with the existing
 // search algorithms (MCTS and Minimax) to create a hybrid intelligence system.
 
-use crate::main::{Board, Battlesnake, Coord, Game};
+use crate::types::{Board, Battlesnake, Coord, Game};
 use crate::logic::{Direction, SafetyChecker, ReachabilityAnalyzer, FoodSeeker};
 use crate::neural_network::{NeuralNetworkEvaluator, get_neural_network_evaluator, NeuralNetworkType};
 use anyhow::Result;

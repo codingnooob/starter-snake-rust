@@ -4,7 +4,7 @@
 use crate::adaptive_neural_system::{AdaptiveNeuralSystem, GameOutcome};
 use crate::neural_confidence_integration::DecisionOutcome;
 use crate::confidence_validation::GameValidationContext;
-use crate::main::{Board, Battlesnake, Coord};
+use crate::{Board, Battlesnake, Coord};
 use anyhow::{Result, anyhow};
 use std::sync::{Arc, Mutex};
 use log::{info, warn, debug, error};
@@ -64,10 +64,9 @@ impl EnhancedDecisionSystem {
                     board, you, turn, safe_moves
                 )?;
                 
-                info!("Enhanced decision: move '{}', confidence {:.3}, source: {:?}", 
+                info!("Enhanced decision: move '{}', confidence {:.3}",
                       chosen_move,
-                      decision_record.confidence.unified_confidence,
-                      decision_record.decision_source);
+                      decision_record.confidence.unified_confidence);
                 
                 Ok(chosen_move)
             } else {
@@ -371,8 +370,8 @@ pub fn create_move_context(
         turn_number: turn,
         health_before: you_before.health,
         health_after: you_after.health,
-        length_before: you_before.length,
-        length_after: you_after.length,
+        length_before: you_before.length as usize,
+        length_after: you_after.length as usize,
         distance_to_food_before: food_distance_before,
         distance_to_food_after: food_distance_after,
         danger_level: calculate_position_danger_level(&you_after.body[0], board_after, you_after),

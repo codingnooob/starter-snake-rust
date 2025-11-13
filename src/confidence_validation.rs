@@ -4,7 +4,7 @@
 
 use crate::neural_confidence_integration::{NeuralDecisionRecord, DecisionOutcome, EnhancedNeuralEvaluator};
 use crate::unified_confidence::{ConfidenceLevel, ConfidenceConfig};
-use crate::main::{Board, Battlesnake, Coord};
+use crate::{Board, Battlesnake, Coord};
 use anyhow::{Result, anyhow};
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
@@ -59,7 +59,7 @@ pub struct ConfidenceCorrelation {
 }
 
 /// Tracks performance of different confidence thresholds
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ThresholdPerformanceTracker {
     pub threshold_tests: HashMap<String, ThresholdTestResult>,
     pub optimal_thresholds: HashMap<String, f32>,
@@ -74,13 +74,13 @@ pub struct ThresholdTestResult {
     pub true_negatives: u32,  // Low confidence, poor outcome (correctly avoided)
     pub false_negatives: u32, // Low confidence, good outcome (missed opportunity)
     pub precision: f32,       // TP / (TP + FP)
-    pub recall: f32,          // TP / (TP + FN) 
+    pub recall: f32,          // TP / (TP + FN)
     pub f1_score: f32,        // 2 * (precision * recall) / (precision + recall)
     pub accuracy: f32,        // (TP + TN) / (TP + FP + TN + FN)
 }
 
 /// Overall calibration metrics for the confidence system
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct CalibrationMetrics {
     pub expected_calibration_error: f32, // ECE - measures calibration quality
     pub maximum_calibration_error: f32,  // MCE - worst calibration bin
@@ -122,7 +122,7 @@ impl ConfidenceValidator {
             confidence_score: decision_record.confidence.unified_confidence,
             confidence_level: decision_record.confidence.confidence_level.clone(),
             predicted_move_quality: decision_record.confidence.unified_confidence, // Use confidence as quality prediction
-            actual_move_outcome: actual_outcome,
+            actual_move_outcome: actual_outcome.clone(),
             outcome_score,
             game_context: validation_context,
             validation_timestamp: chrono::Utc::now().to_rfc3339(),
@@ -157,7 +157,7 @@ impl ConfidenceValidator {
         // Calculate correlations by confidence level
         for level in [ConfidenceLevel::High, ConfidenceLevel::Medium, ConfidenceLevel::Low] {
             let level_data: Vec<_> = self.validation_data.iter()
-                .filter(|record| matches!(record.confidence_level, level))
+                .filter(|record| matches!(&record.confidence_level, level))
                 .collect();
             
             if level_data.len() >= 5 {
@@ -262,6 +262,11 @@ impl ConfidenceValidator {
 
         info!("Generated optimized configuration based on {} validation samples", self.validation_data.len());
         Ok(config)
+    }
+
+    /// Get outcome correlations (public accessor)
+    pub fn get_outcome_correlations(&self) -> &HashMap<String, ConfidenceCorrelation> {
+        &self.outcome_correlations
     }
 
     /// Export validation analysis for review and debugging
@@ -485,8 +490,8 @@ impl ConfidenceValidator {
             bin_counts[bin_idx] += 1;
         }
 
-        let mut ece = 0.0;
-        let mut mce = 0.0;
+        let mut ece = 0.0f32;
+        let mut mce = 0.0f32;
         let total_samples = self.validation_data.len() as f32;
 
         for i in 0..bin_count {
