@@ -59,7 +59,7 @@ def create_corner_trap_scenario():
         }
     }
 
-def test_emergency_fallback(server_url="http://localhost:8888"):
+def test_emergency_fallback(server_url="http://localhost:8001"):
     """Test the emergency fallback logic by sending a trap scenario"""
     
     print("EMERGENCY FALLBACK BUG FIX VALIDATION TEST")
